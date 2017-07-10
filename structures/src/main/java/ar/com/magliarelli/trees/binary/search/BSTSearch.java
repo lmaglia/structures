@@ -42,10 +42,8 @@ public class BSTSearch<T extends Comparable<T>> implements Search<T> {
 		boolean inserted = true;
 		int increment = 1;
 		BinaryTree<T> aux = BinaryTree.nil();
-		Stack<InsertTuple<T>> stack = new Stack<InsertTuple<T>>();
-		InsertTuple<T> tuple = new InsertTuple<>();
-		tuple.finished = false;
-		tuple.tree = this.tree;
+		Stack<Tuple<T>> stack = new Stack<Tuple<T>>();
+		Tuple<T> tuple = new Tuple<T>(this.tree,null,false,false);		
 		stack.push(tuple);
 		while (!stack.isEmpty()) {
 			tuple = stack.pop();
@@ -60,30 +58,14 @@ public class BSTSearch<T extends Comparable<T>> implements Search<T> {
 					aux = BinaryTree.leaf(elem);
 				} else {
 					if (tuple.tree.root().compareTo(elem) > 0) {
-						InsertTuple<T> rightTree = new InsertTuple<T>();
-						rightTree.finished = true;
-						rightTree.left = false;
-						rightTree.parent = tuple.tree.root();
-						rightTree.tree = tuple.tree.right();
+						Tuple<T> rightTree = new Tuple<T>(tuple.tree.right(),tuple.tree.root(), false,true);						
 						stack.push(rightTree);
-						InsertTuple<T> leftTree = new InsertTuple<T>();
-						leftTree.finished = false;
-						leftTree.left = true;
-						leftTree.parent = null;
-						leftTree.tree = tuple.tree.left();
+						Tuple<T> leftTree = new Tuple<T>(tuple.tree.left(),null,true,false);						
 						stack.push(leftTree);
 					} else if (tuple.tree.root().compareTo(elem) < 0) {
-						InsertTuple<T> leftTree = new InsertTuple<T>();
-						leftTree.finished = true;
-						leftTree.left = true;
-						leftTree.parent = tuple.tree.root();
-						leftTree.tree = tuple.tree.left();
+						Tuple<T> leftTree = new Tuple<T>(tuple.tree.left(),tuple.tree.root(), true, true);						
 						stack.push(leftTree);
-						InsertTuple<T> rightTree = new InsertTuple<T>();
-						rightTree.finished = false;
-						rightTree.left = false;
-						rightTree.parent = null;
-						rightTree.tree = tuple.tree.right();
+						Tuple<T> rightTree = new Tuple<T>(tuple.tree.right(),null,false,false);						
 						stack.push(rightTree);
 					} else {
 						aux = BinaryTree.bin(tuple.tree.left(), elem, tuple.tree.right());
@@ -172,10 +154,8 @@ public class BSTSearch<T extends Comparable<T>> implements Search<T> {
 		int decrement = 0;
 		T removed = null;
 		BinaryTree<T> aux = BinaryTree.nil();
-		Stack<InsertTuple<T>> stack = new Stack<InsertTuple<T>>();
-		InsertTuple<T> tuple = new InsertTuple<>();
-		tuple.finished = false;
-		tuple.tree = this.tree;
+		Stack<Tuple<T>> stack = new Stack<Tuple<T>>();
+		Tuple<T> tuple = new Tuple<T>(this.tree,null,false,false);		
 		stack.push(tuple);
 		while (!stack.isEmpty()) {
 			tuple = stack.pop();
@@ -190,30 +170,14 @@ public class BSTSearch<T extends Comparable<T>> implements Search<T> {
 					aux = BinaryTree.nil();
 				} else {
 					if (tuple.tree.root().compareTo(elem) > 0) {
-						InsertTuple<T> rightTree = new InsertTuple<T>();
-						rightTree.finished = true;
-						rightTree.left = false;
-						rightTree.parent = tuple.tree.root();
-						rightTree.tree = tuple.tree.right();
+						Tuple<T> rightTree = new Tuple<T>(tuple.tree.right(),tuple.tree.root(),false,true);						
 						stack.push(rightTree);
-						InsertTuple<T> leftTree = new InsertTuple<T>();
-						leftTree.finished = false;
-						leftTree.left = true;
-						leftTree.parent = null;
-						leftTree.tree = tuple.tree.left();
+						Tuple<T> leftTree = new Tuple<T>(tuple.tree.left(),null,true,false);						
 						stack.push(leftTree);
 					} else if (tuple.tree.root().compareTo(elem) < 0) {
-						InsertTuple<T> leftTree = new InsertTuple<T>();
-						leftTree.finished = true;
-						leftTree.left = true;
-						leftTree.parent = tuple.tree.root();
-						leftTree.tree = tuple.tree.left();
+						Tuple<T> leftTree = new Tuple<T>(tuple.tree.left(),tuple.tree.root(),true,true);						
 						stack.push(leftTree);
-						InsertTuple<T> rightTree = new InsertTuple<T>();
-						rightTree.finished = false;
-						rightTree.left = false;
-						rightTree.parent = null;
-						rightTree.tree = tuple.tree.right();
+						Tuple<T> rightTree = new Tuple<T>(tuple.tree.right(),null,false,false);						
 						stack.push(rightTree);
 					} else {
 						if (tuple.tree.root().compareTo(elem) == 0) {
@@ -222,33 +186,17 @@ public class BSTSearch<T extends Comparable<T>> implements Search<T> {
 							T suc = this.successor(tuple.tree, elem);
 							if (suc != null) {
 								elem = suc;
-								InsertTuple<T> leftTree = new InsertTuple<T>();
-								leftTree.finished = true;
-								leftTree.left = true;
-								leftTree.parent = suc;
-								leftTree.tree = tuple.tree.left();
+								Tuple<T> leftTree = new Tuple<T>(tuple.tree.left(),suc,true,true);								
 								stack.push(leftTree);
-								InsertTuple<T> rightTree = new InsertTuple<T>();
-								rightTree.finished = false;
-								rightTree.left = false;
-								rightTree.parent = null;
-								rightTree.tree = tuple.tree.right();
+								Tuple<T> rightTree = new Tuple<T>(tuple.tree.right(),null,false,false);								
 								stack.push(rightTree);
 							} else {
 								T pred = this.predecessor(tuple.tree, elem);
 								if (pred != null) {
 									elem = pred;
-									InsertTuple<T> rightTree = new InsertTuple<T>();
-									rightTree.finished = true;
-									rightTree.left = false;
-									rightTree.parent = tuple.tree.root();
-									rightTree.tree = tuple.tree.right();
+									Tuple<T> rightTree = new Tuple<T>(tuple.tree.right(),tuple.tree.root(),false,true);									
 									stack.push(rightTree);
-									InsertTuple<T> leftTree = new InsertTuple<T>();
-									leftTree.finished = false;
-									leftTree.left = true;
-									leftTree.parent = null;
-									leftTree.tree = tuple.tree.left();
+									Tuple<T> leftTree = new Tuple<T>(tuple.tree.left(),null,true,false);									
 									stack.push(leftTree);
 								} else {
 									aux = BinaryTree.nil();
@@ -377,10 +325,18 @@ public class BSTSearch<T extends Comparable<T>> implements Search<T> {
 		return this.size;
 	}
 
-	private static class InsertTuple<T> {
+	private static class Tuple<T> {
 		public BinaryTree<T> tree;
 		public T parent;
 		public boolean left;
 		public boolean finished;
+		public Tuple(BinaryTree<T> tree, T parent, boolean left, boolean finished) {
+			super();
+			this.tree = tree;
+			this.parent = parent;
+			this.left = left;
+			this.finished = finished;
+		}
+		
 	}
 }
