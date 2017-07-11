@@ -25,11 +25,19 @@ gDelete(p,t) =
 	if vacia?(p) then
 		t
 	else
-		if borrado?( top(p) ) then
+		if procesado?( top(p) ) then
 			if izq?( top(p) ) then
-				gDelete(desapilar(p), <elem(top(p)), bin( tree( top(p)), root( top(p)), tree(t) )  > )   (1)
+				if borrado?(top(p)) then
+					gDelete(desapilar(p), <elem(top(p)), bin( tree( top(p)), root( top(p)), tree(t) )  > )   (1)
+				else
+					gDelete(desapilar(p), <root(t), bin( tree( top(p)), root( top(p)), tree(t) )  > )
+				fi
 			else
-				gDelete(desapilar(p), <elem(top(p)), bin(tree(t), root( top(p)),tree( top(p))) >)        (2)
+				if borrado?(top(p)) then
+					gDelete(desapilar(p), <elem(top(p)), bin(tree(t), root( top(p)),tree( top(p))) >)        (2)
+				else
+					gDelete(desapilar(p), <root(t), bin(tree(t), root( top(p)),tree( top(p))) >)
+				fi
 			fi
 		else
 			gDelete(desapilar(p), delete(tree( top(p)), elem(top(p)))))                              (3)
@@ -58,53 +66,60 @@ gDelete(desapilar(p), delete(tree( top(p) ), elem(top(p))))) =
 	fi
 
 gDelete(desapilar(p),<root(tree(top(p))), bin(izq(tree(top(p))),suc(tree(top(p)), elem(top(p)),tree(delete( der(tree(top(p)) ),suc(tree(top(p)), elem(top(p))) )) )>)=                     (3.1)
-gDelete(apilar(<izq(tree(top(p))), suc(tree(top(p)), elem(top(p)),elem(top(p)), true, true> , desapilar(p)), delete( der(tree(top(p)) ),suc(tree(top(p)), elem(top(p))) ) )=
-gDelete(apilar(<der(tree(top(p))),nil,suc(tree(top(p)), elem(top(p))),false,false>,apilar(<izq(tree(top(p))), suc(tree(top(p)), elem(top(p)),elem(top(p)), true, true> , desapilar(p))),t)
+gDelete(apilar(<izq(tree(top(p))),suc(tree(top(p)), elem(top(p))),root(tree(top(p))),true,true,true>,desapilar(p)),delete( der(tree(top(p)) ),suc(tree(top(p)), elem(top(p))) ))))
+gDelete(apilar(<der(tree(top(p))),nil,suc(tree(top(p)), elem(top(p))),false,false,false>,apilar(<izq(tree(top(p))),suc(tree(top(p)), elem(top(p))),root(tree(top(p))),true,true,true>,desapilar(p)),t)
 
 
-gDelete(desapilar(p), <root(tree(top(p))), bin( tree( delete( izq( tree(top(p)), pred(tree(top(p)), elem(top(p)) ) ) ) ),pred(tree(top(p)), elem(top(p)) ) , der(tree(top(p))) )  > )     (3.2)
-gDelete(apilar(<der(tree(top(p))),pred(tree(top(p)), elem(top(p)) ), elem(top(p)),false,true>,desapilar(p)),delete( izq( tree(top(p))), pred(tree(top(p)), elem(top(p)) ) ) ))
-gDelete(apilar(<izq( tree(top(p))),nil,pred(tree(top(p)), elem(top(p)) ),true,false>,apilar(<der(tree(top(p))),pred(tree(top(p)), elem(top(p)) ), elem(top(p)),false,true>,desapilar(p))),t)
+gDelete(desapilar(p), <root(tree(top(p))), bin( tree( delete( izq( tree(top(p)), pred(tree(top(p)), elem(top(p)) ) ) ) ),pred(tree(top(p)), elem(top(p)) ) , der(tree(top(p))) )  > ) 3.2)
+gDelete(apilar(<der(tree(top(p))),pred(tree(top(p)), elem(top(p)) ),root(tree(top(p))),false,true,true>,desapilar(p)),delete( izq(tree(top(p)) ),pred(tree(top(p)), elem(top(p))) ))))
+gDelete(apilar(<izq(tree(top(p))),nil,pred(tree(top(p)), elem(top(p)) ),true,false,false>,apilar(<der(tree(top(p))),pred(tree(top(p)), elem(top(p)) ),root(tree(top(p))),false,true,true>,desapilar(p))),t)
 
 
 gDelete(desapilar(p),<root(delete(izq(tree(top(p))),elem(top(p))),bin(tree(delete(izq(tree(top(p))),elem(top(p)))), root(tree(top(p))), der(tree(top(p)))))>)                             (3.3)
-gDelete(apilar(< der(tree(top(p)))),  root(tree(top(p))), elem(top(p)),false,true>,desapilar(p)), delete(izq(tree(top(p))),elem(top(p))))
-gDelete(apilar(<izq(tree(top(p))),nil,elem(top(p)),true,false>,apilar(< der(tree(top(p)))),  root(tree(top(p))), elem(top(p)),false,true>,desapilar(p))),t)
+gDelete(apilar(<der(tree(top(p))),root(tree(top(p))),nil,false,true,false>,desapilar(p)),delete(izq(tree(top(p))), elem(top(p))))
+gDelete(apilar(<izq(tree(top(p))),nil,elem(top(p)),true,false,false>,apilar(<der(tree(top(p))),root(tree(top(p))),nil,false,true,false>,desapilar(p))),t)
 
 
 gDelete(desapilar(p),<root(delete(der(tree(top(p))),elem(top(p))),bin(izq(tree(top(p))), root(tree(top(p))), tree(delete(der(tree(top(p))),elem(top(p))))))>)                             (3.4)
-gDelete(apilar(<izq(tree(top(p))),root(tree(top(p))),elem(top(p)), true,true>,desapilar(p)), delete(der(tree(top(p))),elem(top(p)) )
-gDelete(apilar(<der(tree(top(p))),nil,elem(top(p)),false,false>,apilar(<izq(tree(top(p))),root(tree(top(p))),elem(top(p)), true,true>,desapilar(p))),t)
+gDelete(apilar(<izq(tree(top(p))),root(tree(top(p))),nil,true,true,false>,desapilar(p)), delete(der(tree(top(p))),elem(top(p))))
+gDelete(apilar(<der(tree(top(p))),nil,elem(top(p)),false,false,false>,apilar(<izq(tree(top(p))),root(tree(top(p))),nil,true,true,false>,desapilar(p))),t)
 
 
 gDelete(p,t) =
 	if vacia?(p) then
 		t
 	else
-		if borrado?( top(p) ) then
+		if procesado?( top(p) ) then
 			if izq?( top(p) ) then
-				gDelete(desapilar(p), <root(t), bin( tree( top(p)), root( top(p)), tree(t) )  > )   (1)
+				if borrado?(top(p)) then
+					gDelete(desapilar(p), <elem(top(p)), bin( tree( top(p)), root( top(p)), tree(t) )  > )   (1)
+				else
+					gDelete(desapilar(p), <root(t), bin( tree( top(p)), root( top(p)), tree(t) )  > )
+				fi
 			else
-				gDelete(desapilar(p), <root(t), bin(tree(t), root( top(p)),tree( top(p))) >)        (2)
+				if borrado?(top(p)) then
+					gDelete(desapilar(p), <elem(top(p)), bin(tree(t), root( top(p)),tree( top(p))) >)        (2)
+				else
+					gDelete(desapilar(p), <root(t), bin(tree(t), root( top(p)),tree( top(p))) >)
+				fi
 			fi
 		else
 			if nil? (tree(top(p))) then
-				gDelete(desapilar(p),<nil,nil>)
-			
+				gDelete(desapilar(p),<nil,nil>)			
 			else
 				if root(tree(top(p))) = elem(top(p)) then
 					if suc(tree(top(p)), elem(top(p)) !=nil then
-						gDelete(apilar(<der(tree(top(p))),nil,suc(tree(top(p)), elem(top(p))),false,false>,apilar(<izq(tree(top(p))), suc(tree(top(p)), elem(top(p)),elem(top(p)), true, true> , desapilar(p))),t)
+						gDelete(apilar(<der(tree(top(p))),nil,suc(tree(top(p)), elem(top(p))),false,false,false>,apilar(<izq(tree(top(p))),suc(tree(top(p)), elem(top(p))),root(tree(top(p))),true,true,true>,desapilar(p)),t)
 					else if pred(tree(top(p)), elem(top(p)) ) != nil then
-						gDelete(apilar(<izq( tree(top(p))),nil,pred(tree(top(p)), elem(top(p)) ),true,false>,apilar(<der(tree(top(p))),pred(tree(top(p)), elem(top(p)) ), elem(top(p)),false,true>,desapilar(p))),t)
+						gDelete(apilar(<izq(tree(top(p))),nil,pred(tree(top(p)), elem(top(p)) ),true,false,false>,apilar(<der(tree(top(p))),pred(tree(top(p)), elem(top(p)) ),root(tree(top(p))),false,true,true>,desapilar(p))),t)
 					else
 						gDelete(desapilar(p), <root(tree(top(p)))),nil> )
 					fi
 				else
 					if root(tree(top(p))) > elem(top(p)) then
-					 	gDelete(apilar(<izq(tree(top(p))),nil,elem(top(p)),true,false>,apilar(< der(tree(top(p)))),  root(tree(top(p))), elem(top(p)),false,true>,desapilar(p))),t)
+					 	gDelete(apilar(<izq(tree(top(p))),nil,elem(top(p)),true,false,false>,apilar(<der(tree(top(p))),root(tree(top(p))),nil,false,true,false>,desapilar(p))),t)
 					 else
-					 	gDelete(apilar(<der(tree(top(p))),nil,elem(top(p)),false,false>,apilar(<izq(tree(top(p))),root(tree(top(p))),elem(top(p)), true,true>,desapilar(p))),t)
+					 	gDelete(apilar(<der(tree(top(p))),nil,elem(top(p)),false,false,false>,apilar(<izq(tree(top(p))),root(tree(top(p))),nil,true,true,false>,desapilar(p))),t)
 					 fi
 				fi
 			fi
@@ -112,7 +127,7 @@ gDelete(p,t) =
 	fi
 	
 Initial Params:
-p=apilar(<a,nil,x,false,false>,[])
+p=apilar(<a,nil,x,false,false,false>,[])
 t=<nil,nil>
 
 iDelete:ab(a) x a -> <a, ab(a) >
@@ -121,34 +136,40 @@ iDelete(a,x)
 	t=<nil,nil>
 	while(!vacia?(p)) {
 		p= desapilar(p)
-		if borrado?( top(p) ) then
+		if procesado?( top(p) ) then
 			if izq?( top(p) ) then
-				t= <elem(top(p)), bin( tree( top(p)), root( top(p)), tree(t) )  > 
+				if borrado?(top(p)) then
+					t= <elem(top(p)), bin( tree( top(p)), root( top(p)), tree(t) )  > 
+				else
+					t= <root(t), bin( tree( top(p)), root( top(p)), tree(t) )  > 
+				fi
 			else
-				t= <elem(top(p)), bin(tree(t), root( top(p)),tree( top(p))) >
+				if borrado?(top(p)) then
+					t= <elem(top(p)), bin(tree(t), root( top(p)),tree( top(p))) >
+				else
+					t=  <root(t), bin(tree(t), root( top(p)),tree( top(p))) >
+				fi
 			fi
 		else
-			if nil? (tree(top(p))) then				
+			if nil? (tree(top(p))) then
 				t= <nil,nil>			
 			else
 				if root(tree(top(p))) = elem(top(p)) then
 					if suc(tree(top(p)), elem(top(p)) !=nil then
-						p= apilar(<der(tree(top(p))),nil,suc(tree(top(p)), elem(top(p))),false,false>,apilar(<izq(tree(top(p))), suc(tree(top(p)), elem(top(p)),elem(top(p)), true, true> , p))						
+						p= apilar(<der(tree(top(p))),nil,suc(tree(top(p)), elem(top(p))),false,false,false>,apilar(<izq(tree(top(p))),suc(tree(top(p)), elem(top(p))),root(tree(top(p))),true,true,true>,p)
 					else if pred(tree(top(p)), elem(top(p)) ) != nil then
-					 p= apilar(<izq( tree(top(p))),nil,pred(tree(top(p)), elem(top(p)) ),true,false>,apilar(<der(tree(top(p))),pred(tree(top(p)), elem(top(p)) ), elem(top(p)),false,true>,p))
+						p=apilar(<izq(tree(top(p))),nil,pred(tree(top(p)), elem(top(p)) ),true,false,false>,apilar(<der(tree(top(p))),pred(tree(top(p)), elem(top(p)) ),root(tree(top(p))),false,true,true>,p)
 					else
 						t= <root(tree(top(p)))),nil> 
 					fi
 				else
 					if root(tree(top(p))) > elem(top(p)) then
-						p= apilar(<izq(tree(top(p))),nil,elem(top(p)),true,false>,apilar(< der(tree(top(p)))),  root(tree(top(p))), elem(top(p)),false,true>,p))					 
+					 	p=apilar(<izq(tree(top(p))),nil,elem(top(p)),true,false,false>,apilar(<der(tree(top(p))),root(tree(top(p))),nil,false,true,false>,p)
 					 else
-					 	p= apilar(<der(tree(top(p))),nil,elem(top(p)),false,false>,apilar(<izq(tree(top(p))),root(tree(top(p))),elem(top(p)), true,true>,p))
+					 	p=apilar(<der(tree(top(p))),nil,elem(top(p)),false,false,false>,apilar(<izq(tree(top(p))),root(tree(top(p))),nil,true,true,false>,p)
 					 fi
 				fi
 			fi
-		fi
-		
-	
+		fi	
 	}
 

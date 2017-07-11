@@ -44,7 +44,7 @@ public class BSTSearch<T extends Comparable<T>> implements Search<T> {
 		int increment = 1;
 		BinaryTree<T> aux = BinaryTree.nil();
 		Stack<Tuple<T>> stack = new Stack<Tuple<T>>();
-		Tuple<T> tuple = new Tuple<T>(this.tree, null, null, false, false);
+		Tuple<T> tuple = new Tuple<T>(this.tree, null, null, false, false, false);
 		stack.push(tuple);
 		while (!stack.isEmpty()) {
 			tuple = stack.pop();
@@ -59,14 +59,14 @@ public class BSTSearch<T extends Comparable<T>> implements Search<T> {
 					aux = BinaryTree.leaf(elem);
 				} else {
 					if (tuple.tree.root().compareTo(elem) > 0) {
-						Tuple<T> rightTree = new Tuple<T>(tuple.tree.right(), tuple.tree.root(), null, false, true);
+						Tuple<T> rightTree = new Tuple<T>(tuple.tree.right(), tuple.tree.root(), null, false, true, false);
 						stack.push(rightTree);
-						Tuple<T> leftTree = new Tuple<T>(tuple.tree.left(), null, null, true, false);
+						Tuple<T> leftTree = new Tuple<T>(tuple.tree.left(), null, null, true, false, false);
 						stack.push(leftTree);
 					} else if (tuple.tree.root().compareTo(elem) < 0) {
-						Tuple<T> leftTree = new Tuple<T>(tuple.tree.left(), tuple.tree.root(), null, true, true);
+						Tuple<T> leftTree = new Tuple<T>(tuple.tree.left(), tuple.tree.root(), null, true, true, false);
 						stack.push(leftTree);
-						Tuple<T> rightTree = new Tuple<T>(tuple.tree.right(), null, null, false, false);
+						Tuple<T> rightTree = new Tuple<T>(tuple.tree.right(), null, null, false, false, false);
 						stack.push(rightTree);
 					} else {
 						aux = BinaryTree.bin(tuple.tree.left(), elem, tuple.tree.right());
@@ -155,16 +155,20 @@ public class BSTSearch<T extends Comparable<T>> implements Search<T> {
 		T removed = null;
 		BinaryTree<T> aux = BinaryTree.nil();
 		Stack<Tuple<T>> stack = new Stack<Tuple<T>>();
-		Tuple<T> tuple = new Tuple<T>(this.tree, null, elem, false, false);
+		Tuple<T> tuple = new Tuple<T>(this.tree, null, elem, false, false, false);
 		stack.push(tuple);
 		while (!stack.isEmpty()) {
 			tuple = stack.pop();
-			if (tuple.finished) {
+			if (tuple.finished) {						
 				if (tuple.left) {
-					removed= tuple.elem;
+					if(tuple.erased) {
+						removed= tuple.elem;
+					}
 					aux = BinaryTree.bin(tuple.tree, tuple.parent, aux);
 				} else {
-					removed= tuple.elem;
+					if(tuple.erased) {
+						removed= tuple.elem;
+					}
 					aux = BinaryTree.bin(aux, tuple.parent, tuple.tree);
 				}
 			} else {
@@ -173,31 +177,31 @@ public class BSTSearch<T extends Comparable<T>> implements Search<T> {
 					aux = BinaryTree.nil();
 				} else {
 					if (tuple.tree.root().compareTo(tuple.elem) > 0) {
-						Tuple<T> rightTree = new Tuple<T>(tuple.tree.right(), tuple.tree.root(), tuple.elem, false,
-								true);
+						Tuple<T> rightTree = new Tuple<T>(tuple.tree.right(), tuple.tree.root(), null, false,
+								true, false);
 						stack.push(rightTree);
-						Tuple<T> leftTree = new Tuple<T>(tuple.tree.left(), null, tuple.elem, true, false);
+						Tuple<T> leftTree = new Tuple<T>(tuple.tree.left(), null, tuple.elem, true, false, false);
 						stack.push(leftTree);
 					} else if (tuple.tree.root().compareTo(tuple.elem) < 0) {
-						Tuple<T> leftTree = new Tuple<T>(tuple.tree.left(), tuple.tree.root(), tuple.elem, true, true);
+						Tuple<T> leftTree = new Tuple<T>(tuple.tree.left(), tuple.tree.root(), tuple.elem, true, true, false);
 						stack.push(leftTree);
-						Tuple<T> rightTree = new Tuple<T>(tuple.tree.right(), null, tuple.elem, false, false);
+						Tuple<T> rightTree = new Tuple<T>(tuple.tree.right(), null, tuple.elem, false, false, false);
 						stack.push(rightTree);
 					} else {
 						if (tuple.tree.root().compareTo(tuple.elem) == 0) {
 							T suc = this.successor(tuple.tree, tuple.elem);
 							if (suc != null) {
-								Tuple<T> leftTree = new Tuple<T>(tuple.tree.left(), suc, tuple.tree.root(), true, true);
+								Tuple<T> leftTree = new Tuple<T>(tuple.tree.left(), suc, tuple.tree.root(), true, true, true);
 								stack.push(leftTree);
-								Tuple<T> rightTree = new Tuple<T>(tuple.tree.right(), null, suc, false, false);
+								Tuple<T> rightTree = new Tuple<T>(tuple.tree.right(), null, suc, false, false, false);
 								stack.push(rightTree);
 							} else {
 								T pred = this.predecessor(tuple.tree, tuple.elem);
 								if (pred != null) {
 									Tuple<T> rightTree = new Tuple<T>(tuple.tree.right(), pred, tuple.tree.root(), false,
-											true);
+											true, true);
 									stack.push(rightTree);
-									Tuple<T> leftTree = new Tuple<T>(tuple.tree.left(), null, pred, true, false);
+									Tuple<T> leftTree = new Tuple<T>(tuple.tree.left(), null, pred, true, false, false);
 									stack.push(leftTree);
 								} else {
 									removed = tuple.tree.root();
@@ -335,14 +339,16 @@ public class BSTSearch<T extends Comparable<T>> implements Search<T> {
 		public T elem;
 		public boolean left;
 		public boolean finished;
+		public boolean erased;
 
-		public Tuple(BinaryTree<T> tree, T parent, T elem, boolean left, boolean finished) {
+		public Tuple(BinaryTree<T> tree, T parent, T elem, boolean left, boolean finished, boolean erased) {
 			super();
 			this.tree = tree;
 			this.parent = parent;
 			this.elem = elem;
 			this.left = left;
 			this.finished = finished;
+			this.erased= erased;
 		}
 
 	}
