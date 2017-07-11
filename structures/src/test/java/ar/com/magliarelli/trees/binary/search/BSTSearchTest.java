@@ -99,4 +99,62 @@ public class BSTSearchTest {
 			Assert.assertEquals(i, search.search(i));
 		}		
 	}
+	
+	@Test
+	public void deleteLeaves(){
+		BSTSearch<Integer> search= new BSTSearch<Integer>();
+		search.insert(4);
+		search.insert(3);
+		search.insert(5);
+		search.insert(1);
+		search.insert(2);
+		search.insert(6);
+		search.insert(7);
+		
+		
+		List<Integer> deletionOrder= Arrays.asList(2,7,1,6,3,5,4);
+		int expectedSize= deletionOrder.size();
+		for(Integer i:deletionOrder) {						
+			Assert.assertEquals("It should have returned " + i,i, search.delete(i));
+			expectedSize--;
+			Assert.assertEquals("The size is not expected",expectedSize, search.size());
+			Assert.assertFalse(search.contains(i));
+		}				
+	}
+	@Test
+	public void deleteRoots(){
+		BSTSearch<Integer> search= new BSTSearch<Integer>();
+		search.insert(4);
+		search.insert(3);
+		search.insert(5);
+		search.insert(1);
+		search.insert(2);
+		search.insert(6);
+		search.insert(7);		
+		
+		List<Integer> deletionOrder= Arrays.asList(4,3,5,1,6,2,7);
+		int expectedSize= deletionOrder.size();
+		for(Integer i:deletionOrder) {
+			Assert.assertEquals("The element returned by delete is not expected",i, search.delete(i));			
+			expectedSize--;			
+			Assert.assertEquals("The size is not expected",expectedSize, search.size());
+			Assert.assertFalse("It should not have contained " + i,search.contains(i));
+		}				
+	}
+	@Test
+	public void deleteBadBranch(){
+		BSTSearch<Integer> search= new BSTSearch<Integer>();
+		search.insert(3);
+		search.insert(1);
+		search.insert(2);		
+		
+		List<Integer> deletionOrder= Arrays.asList(3,1,2);
+		int expectedSize= deletionOrder.size();
+		for(Integer i:deletionOrder) {
+			Assert.assertEquals("The element returned by delete is not expected",i, search.delete(i));			
+			expectedSize--;			
+			Assert.assertEquals("The size is not expected",expectedSize, search.size());
+			Assert.assertFalse("It should not have contained " + i,search.contains(i));
+		}				
+	}
 }
