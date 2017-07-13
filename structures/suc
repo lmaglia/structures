@@ -1,0 +1,64 @@
+suc:ab(a) x a -> a
+suc(a,x) = 
+	if nil?(a) then
+		undefined
+	else
+		if raiz(a) = x then
+			min(der(a))
+		else
+			if raiz(a) > x then
+				if suc(izq(a),x) != undefined then
+					suc(izq(a),x)			
+				else
+					parent(a,x)
+				fi
+			else
+				if suc(der(a),x) != undefined then
+					suc(der(a),x)			
+				else
+					parent(a,x)
+				fi
+			fi
+		fi
+	fi
+min:ab(a) -> a
+min(a) =
+	if nil?(a) then
+		undefined
+	else
+		if nil?(izq(a)) then
+			raiz(a)
+		else
+			min(izq(a))
+		fi
+	fi
+
+parent:ab(a) x a -> a
+parent(a,x) =
+	if nil?(a) then
+		undefined
+	else
+		if raiz(a) = x then
+			undefined
+		else
+			if raiz(a) > x then
+				if !nil?(izq(a)) & raiz(izq(a)) = x then
+					raiz(a)
+				else
+					parent(izq(a),x)
+				fi	
+			else
+				if !nil?(der(a)) & raiz(der(a)) = x then
+					raiz(a)
+				else
+					parent(der(a),x)
+				fi
+			fi
+		fi
+	fi
+
+gSuc:ab(a) x ab(a) x a -> <a x a x a >
+gSuc(a,b,x) = <suc(a,x),min(b), parent(a,x)>
+
+				
+				
