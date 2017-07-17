@@ -57,8 +57,168 @@ parent(a,x) =
 		fi
 	fi
 
-gSuc:ab(a) x ab(a) x a -> <a x a x a >
-gSuc(a,b,x) = <suc(a,x),min(b), parent(a,x)>
 
-				
-				
+
+gSuc(a,x) = <suc(a,x), parent(a,x) >
+
+	if nil?(a) then
+		<undefined, parent(a,x)> =
+		<undefined,undefined>
+	else
+		if raiz(a) = x then
+			<min(der(a)), parent(a,x)> =
+			<min(der(a)), undefined> =
+		else
+			if raiz(a) > x then
+				if suc(izq(a),x) != undefined then
+					<suc(izq(a),x), parent(a,x)> = 
+					if !nil?(izq(a)) & raiz(izq(a)) = x then
+						<suc(izq(a),x), raiz(a)> = <pi1(gSuc(izq(a),x)),raiz(a)>						
+					else
+						<suc(izq(a),x), parent(izq(a),x)> =		gSuc(izq(a),x)				
+					fi				
+				else				
+					<parent(a,x),parent(a,x)> =
+					if !nil?(izq(a)) & raiz(izq(a)) = x then
+						<raiz(a),raiz(a)>
+					else
+						<parent(izq(a),x), parent(izq(a),x)> = <pi2(gSuc(izq(a),x)),pi2(gSuc(izq(a),x))> 
+					fi	
+				fi
+			else
+				if suc(der(a),x) != undefined then
+					<suc(der(a),x), parent(a,x)> = 
+					if !nil?(der(a)) & raiz(der(a)) = x then
+						<suc(der(a),x), raiz(a)> =	<pi1(gSuc(der(a),x)),raiz(a)>				
+					else
+						<suc(der(a),x), parent(der(a),x)> = gSuc(der(a),x)
+												
+					fi			
+				else
+					<parent(a,x), parent(a,x)> = 
+					if !nil?(der(a)) & raiz(der(a)) = x then
+						<raiz(a),raiz(a)>
+					else
+						<parent(der(a),x), parent(der(a),x)> = <pi2(gSuc(der(a),x)),pi2(gSuc(der(a),x))>
+					fi	
+				fi
+			fi
+		fi
+	fi =
+	
+	if nil?(a) then		
+		<undefined,undefined>
+	else
+		if raiz(a) = x then			
+			<min(der(a)), undefined> =
+		else
+			if raiz(a) > x then
+				if pi1(gSuc(izq(a),x)) != undefined then					 
+					if !nil?(izq(a)) & raiz(izq(a)) = x then
+						<pi1(gSuc(izq(a),x)),raiz(a)>						
+					else
+						gSuc(izq(a),x)				
+					fi				
+				else									
+					if !nil?(izq(a)) & raiz(izq(a)) = x then
+						<raiz(a),raiz(a)>
+					else
+						<pi2(gSuc(izq(a),x)),pi2(gSuc(izq(a),x))> 
+					fi	
+				fi
+			else
+				if pi1(gSuc(der(a),x)) != undefined then					 
+					if !nil?(der(a)) & raiz(der(a)) = x then
+						<pi1(gSuc(der(a),x)),raiz(a)>				
+					else
+						gSuc(der(a),x)												
+					fi			
+				else					 
+					if !nil?(der(a)) & raiz(der(a)) = x then
+						<raiz(a),raiz(a)>
+					else
+						<pi2(gSuc(der(a),x)),pi2(gSuc(der(a),x))>
+					fi	
+				fi
+			fi
+		fi
+	fi
+
+ggSuc:pila(<ab(a) x mode>) x tupla(< a x a>) x a-> tupla(<a x a>)
+ggSuc(p, t, x) = 
+	if vacia?(p) then
+		t
+	else
+		if pi2(tope(p)) = BOTH then
+			ggSuc(desapilar(p), gSuc(pi1(tope(p)),x),x)
+		else
+			if pi2(tope(p)) = PARENT then
+				ggSuc(desapilar(p), <pi2(gSuc(pi1(tope(p)),x)),pi2(gSuc(pi1(tope(p)),x))>,x)
+			else
+				ggSuc(desapilar(p),<pi1(gSuc(pi1(tope(p)),x)), pi2(t)>,x)
+			fi
+		fi
+	fi
+
+suc(a,x) = pi1(gSuc(a,x))
+
+inorder:ab(a) -> secu(a)
+inorder(a) =
+	if nil?(a) then
+		<>
+	else
+		inorder(izq(a)) & raiz(a) * inorder(der(a))
+	fi
+suc:ab(a) x a  - > a
+suc(a,x) = findSuc(inorder(a),x)
+
+findSuc:secu(a) x a -> a
+findSuc(s,x) = 
+	if vacia?(s) then
+		undefined
+	else
+		if prim(s) = x then
+			if !vacia?(fin(s)) then
+				prim(fin(s))
+			else
+				undefined
+			fi
+		else
+			findSuc(fin(s), x )
+		fi
+	fi 
+findSuc(inorder(a),x) =
+	if nil?(a) then
+		findSuc(<>,x)
+	else
+		findSuc(inorder(izq(a) & raiz(a) * inorder(der),x)
+	fi
+
+gInorder:ab(a) x secu(a) x secu(a) ->secu(a)
+gInorder(a,s,t) = s & inorder(a) & t =
+	if nil?(a) then
+		s & t
+	else
+		s & inorder(izq(a)) & raiz(a) * inorder(der(a)) & t
+		gInorder(izq(a),s,  raiz(a) * inorder(der(a)) & t)
+		gInorder(izq(a),s, gInorder(der(a), <raiz(a)>, t))
+	fi
+ggInorder:pila(<ab(a) x secu(a)>) x secu(a) -> secu(a)
+ggInorder(p,r) = 
+	if vacia?(p) then
+		r
+	else
+		ggInorder(desapilar(p), gInorder(pi1(tope(p)),pi2(tope(p)),r))))
+		if nil?(pi1(tope(p))) then
+			ggInorder(desapilar(p),pi2(tope(p)) & r)
+		else		
+			ggInorder(desapilar(p),gInorder(izq(pi1(tope(p))),pi2(tope(p)), gInorder(der(pi1(tope(p))), <raiz(pi1(tope(p)))>, r))))
+			ggInorder(apilar(<izq(pi1(tope(p))),pi2(tope(p))>,desapilar(p)), gInorder(der(pi1(tope(p)))), pi2(tope(p)),r))
+			ggInorder(apilar(<der(pi1(tope(p))),<raiz(pi1(tope(p)))>>,apilar(<izq(pi1(tope(p))),pi2(tope(p))>,desapilar(p))), r)
+		fi
+	fi
+
+ 
+	
+
+	
