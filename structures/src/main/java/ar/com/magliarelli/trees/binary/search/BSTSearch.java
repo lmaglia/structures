@@ -59,7 +59,8 @@ public class BSTSearch<T extends Comparable<T>> implements Search<T> {
 					aux = BinaryTree.leaf(elem);
 				} else {
 					if (tuple.tree.root().compareTo(elem) > 0) {
-						Tuple<T> rightTree = new Tuple<T>(tuple.tree.right(), tuple.tree.root(), null, false, true, false);
+						Tuple<T> rightTree = new Tuple<T>(tuple.tree.right(), tuple.tree.root(), null, false, true,
+								false);
 						stack.push(rightTree);
 						Tuple<T> leftTree = new Tuple<T>(tuple.tree.left(), null, null, true, false, false);
 						stack.push(leftTree);
@@ -131,8 +132,12 @@ public class BSTSearch<T extends Comparable<T>> implements Search<T> {
 	 */
 	@Override
 	public T minimum() {
+		return min(this.tree);
+	}
+
+	private T min(BinaryTree<T> t) {
 		BinaryTree<T> min = BinaryTree.nil();
-		BinaryTree<T> current = this.tree;
+		BinaryTree<T> current = t;
 		while (!current.isNil()) {
 			min = current;
 			current = current.left();
@@ -159,15 +164,15 @@ public class BSTSearch<T extends Comparable<T>> implements Search<T> {
 		stack.push(tuple);
 		while (!stack.isEmpty()) {
 			tuple = stack.pop();
-			if (tuple.finished) {						
+			if (tuple.finished) {
 				if (tuple.left) {
-					if(tuple.erased) {
-						removed= tuple.elem;
+					if (tuple.erased) {
+						removed = tuple.elem;
 					}
 					aux = BinaryTree.bin(tuple.tree, tuple.parent, aux);
 				} else {
-					if(tuple.erased) {
-						removed= tuple.elem;
+					if (tuple.erased) {
+						removed = tuple.elem;
 					}
 					aux = BinaryTree.bin(aux, tuple.parent, tuple.tree);
 				}
@@ -177,13 +182,14 @@ public class BSTSearch<T extends Comparable<T>> implements Search<T> {
 					aux = BinaryTree.nil();
 				} else {
 					if (tuple.tree.root().compareTo(tuple.elem) > 0) {
-						Tuple<T> rightTree = new Tuple<T>(tuple.tree.right(), tuple.tree.root(), null, false,
-								true, false);
+						Tuple<T> rightTree = new Tuple<T>(tuple.tree.right(), tuple.tree.root(), null, false, true,
+								false);
 						stack.push(rightTree);
 						Tuple<T> leftTree = new Tuple<T>(tuple.tree.left(), null, tuple.elem, true, false, false);
 						stack.push(leftTree);
 					} else if (tuple.tree.root().compareTo(tuple.elem) < 0) {
-						Tuple<T> leftTree = new Tuple<T>(tuple.tree.left(), tuple.tree.root(), tuple.elem, true, true, false);
+						Tuple<T> leftTree = new Tuple<T>(tuple.tree.left(), tuple.tree.root(), tuple.elem, true, true,
+								false);
 						stack.push(leftTree);
 						Tuple<T> rightTree = new Tuple<T>(tuple.tree.right(), null, tuple.elem, false, false, false);
 						stack.push(rightTree);
@@ -191,15 +197,16 @@ public class BSTSearch<T extends Comparable<T>> implements Search<T> {
 						if (tuple.tree.root().compareTo(tuple.elem) == 0) {
 							T suc = this.successor(tuple.tree, tuple.elem);
 							if (suc != null) {
-								Tuple<T> leftTree = new Tuple<T>(tuple.tree.left(), suc, tuple.tree.root(), true, true, true);
+								Tuple<T> leftTree = new Tuple<T>(tuple.tree.left(), suc, tuple.tree.root(), true, true,
+										true);
 								stack.push(leftTree);
 								Tuple<T> rightTree = new Tuple<T>(tuple.tree.right(), null, suc, false, false, false);
 								stack.push(rightTree);
 							} else {
 								T pred = this.predecessor(tuple.tree, tuple.elem);
 								if (pred != null) {
-									Tuple<T> rightTree = new Tuple<T>(tuple.tree.right(), pred, tuple.tree.root(), false,
-											true, true);
+									Tuple<T> rightTree = new Tuple<T>(tuple.tree.right(), pred, tuple.tree.root(),
+											false, true, true);
 									stack.push(rightTree);
 									Tuple<T> leftTree = new Tuple<T>(tuple.tree.left(), null, pred, true, false, false);
 									stack.push(leftTree);
@@ -247,6 +254,7 @@ public class BSTSearch<T extends Comparable<T>> implements Search<T> {
 	 */
 	@Override
 	public T successor(T elem) {
+		//return this.successorAndParent(this.tree, elem).first;
 		return this.successor(this.tree, elem);
 	}
 
@@ -328,6 +336,74 @@ public class BSTSearch<T extends Comparable<T>> implements Search<T> {
 		return pred;
 	}
 
+	private Pair<T, T> successorAndParent(BinaryTree<T> a, T elem) {
+		//TOOD when the successor is the parent, it is not returning the right result
+		Pair<T, T> sucAndP = new Pair<T, T>();
+		Pair<BinaryTree<T>, Boolean> stackElem = new Pair<BinaryTree<T>, Boolean>();
+		stackElem.first = a;
+		stackElem.second = true;
+		Stack<Pair<BinaryTree<T>, Boolean>> stack = new Stack<Pair<BinaryTree<T>, Boolean>>();
+		stack.push(stackElem);
+		while (!stack.isEmpty()) {
+			stackElem = stack.pop();
+			if (stackElem.first.isNil()) {
+				sucAndP.first = null;
+				sucAndP.second = null;
+			} else {
+				if (stackElem.second) {
+					if (stackElem.first.root().compareTo(elem) == 0) {
+						sucAndP.first = this.min(stackElem.first.right());
+						sucAndP.second = null;
+					} else {
+						Pair<BinaryTree<T>, Boolean> se = new Pair<BinaryTree<T>, Boolean>();
+						se.first = stackElem.first;
+						se.second = false;
+						stack.push(se);
+						se = new Pair<BinaryTree<T>, Boolean>();
+						se.second = true;
+						if (stackElem.first.root().compareTo(elem) > 0) {
+							se.first = stackElem.first.left();
+						} else {
+							se.first = stackElem.first.right();
+						}
+						stack.push(se);
+					}
+				} else {
+					BinaryTree<T> tree = stackElem.first;
+
+					if (tree.root().compareTo(elem) > 0) {
+						if (sucAndP.first != null) {
+							if (!tree.left().isNil() && tree.left().root().compareTo(elem) == 0) {
+								sucAndP.second = tree.root();
+							}
+						} else {
+							if (!tree.left().isNil() && tree.left().root().compareTo(elem) == 0) {
+								sucAndP.first = tree.root();
+								sucAndP.second = tree.root();
+							} else {
+								sucAndP.first = sucAndP.second;
+							}
+						}
+					} else {
+						if (sucAndP.first != null) {
+							if (!tree.right().isNil() && tree.right().root().compareTo(elem) == 0) {
+								sucAndP.second = tree.root();
+							}
+						} else {
+							if (!tree.right().isNil() && tree.right().root().compareTo(elem) == 0) {
+								sucAndP.first = tree.root();
+								sucAndP.second = tree.root();
+							} else {
+								sucAndP.first = sucAndP.second;
+							}
+						}
+					}
+				}
+			}
+		}
+		return sucAndP;
+	}
+
 	@Override
 	public int size() {
 		return this.size;
@@ -348,8 +424,13 @@ public class BSTSearch<T extends Comparable<T>> implements Search<T> {
 			this.elem = elem;
 			this.left = left;
 			this.finished = finished;
-			this.erased= erased;
+			this.erased = erased;
 		}
 
+	}
+
+	private static class Pair<T, U> {
+		public T first;
+		public U second;
 	}
 }
