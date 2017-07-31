@@ -254,8 +254,10 @@ public class BSTSearch<T extends Comparable<T>> implements Search<T> {
 	 */
 	@Override
 	public T successor(T elem) {
-		//return this.successorAndParent(this.tree, elem).first;
-		return this.successor(this.tree, elem);
+		// return this.successorAndParent(this.tree, elem).first;
+		// return this.successor(this.tree, elem);
+		// return this.recursiveSuc(tree, elem);
+		return this.iSuccessor(this.tree, elem);
 	}
 
 	private T successor(BinaryTree<T> aTree, T elem) {
@@ -336,72 +338,79 @@ public class BSTSearch<T extends Comparable<T>> implements Search<T> {
 		return pred;
 	}
 
-	private Pair<T, T> successorAndParent(BinaryTree<T> a, T elem) {
-		//TOOD when the successor is the parent, it is not returning the right result
-		Pair<T, T> sucAndP = new Pair<T, T>();
-		Pair<BinaryTree<T>, Boolean> stackElem = new Pair<BinaryTree<T>, Boolean>();
-		stackElem.first = a;
-		stackElem.second = true;
-		Stack<Pair<BinaryTree<T>, Boolean>> stack = new Stack<Pair<BinaryTree<T>, Boolean>>();
-		stack.push(stackElem);
-		while (!stack.isEmpty()) {
-			stackElem = stack.pop();
-			if (stackElem.first.isNil()) {
-				sucAndP.first = null;
-				sucAndP.second = null;
+	private T recursiveSuc(BinaryTree<T> t, T e) {
+		T suc = null;
+		if (!t.isNil()) {
+			if (t.root().compareTo(e) == 0) {
+				suc = min(t.right());
 			} else {
-				if (stackElem.second) {
-					if (stackElem.first.root().compareTo(elem) == 0) {
-						sucAndP.first = this.min(stackElem.first.right());
-						sucAndP.second = null;
-					} else {
-						Pair<BinaryTree<T>, Boolean> se = new Pair<BinaryTree<T>, Boolean>();
-						se.first = stackElem.first;
-						se.second = false;
-						stack.push(se);
-						se = new Pair<BinaryTree<T>, Boolean>();
-						se.second = true;
-						if (stackElem.first.root().compareTo(elem) > 0) {
-							se.first = stackElem.first.left();
-						} else {
-							se.first = stackElem.first.right();
-						}
-						stack.push(se);
+				if (t.root().compareTo(e) > 0) {
+					suc = this.recursiveSuc(t.left(), e);
+					if (suc == null) {
+						suc = t.root();
 					}
 				} else {
-					BinaryTree<T> tree = stackElem.first;
+					suc = this.recursiveSuc(t.right(), e);
+				}
+			}
+		}
+		return suc;
+	}
 
-					if (tree.root().compareTo(elem) > 0) {
-						if (sucAndP.first != null) {
-							if (!tree.left().isNil() && tree.left().root().compareTo(elem) == 0) {
-								sucAndP.second = tree.root();
-							}
-						} else {
-							if (!tree.left().isNil() && tree.left().root().compareTo(elem) == 0) {
-								sucAndP.first = tree.root();
-								sucAndP.second = tree.root();
-							} else {
-								sucAndP.first = sucAndP.second;
-							}
-						}
+	private T iSuccessor(BinaryTree<T> t, T x) {
+		T r = null;
+		Stack<Pair<BinaryTree<T>, Boolean>> p = new Stack<Pair<BinaryTree<T>, Boolean>>();
+		Pair<BinaryTree<T>, Boolean> se = new Pair<BinaryTree<T>, Boolean>();
+		se.first = t;
+		se.second = true;
+		p.push(se);
+		while (!p.isEmpty()) {
+			se = p.pop();
+			if (se.second) {
+				if (se.first.isNil()) {
+					Pair<BinaryTree<T>, Boolean> newSe = new Pair<BinaryTree<T>, Boolean>();
+					newSe.first = se.first;
+					newSe.second = false;
+					p.push(newSe);
+					r = null;
+				} else {
+					if (se.first.root().compareTo(x) == 0) {
+						Pair<BinaryTree<T>, Boolean> newSe = new Pair<BinaryTree<T>, Boolean>();
+						newSe.first = se.first;
+						newSe.second = false;
+						p.push(newSe);
+						r = min(se.first.right());
 					} else {
-						if (sucAndP.first != null) {
-							if (!tree.right().isNil() && tree.right().root().compareTo(elem) == 0) {
-								sucAndP.second = tree.root();
-							}
+						if (se.first.root().compareTo(x) > 0) {
+							Pair<BinaryTree<T>, Boolean> newSe = new Pair<BinaryTree<T>, Boolean>();
+							newSe.first = se.first;
+							newSe.second = false;
+							p.push(newSe);
+							newSe = new Pair<BinaryTree<T>, Boolean>();
+							newSe.first = se.first.left();
+							newSe.second = true;
+							p.push(newSe);
 						} else {
-							if (!tree.right().isNil() && tree.right().root().compareTo(elem) == 0) {
-								sucAndP.first = tree.root();
-								sucAndP.second = tree.root();
-							} else {
-								sucAndP.first = sucAndP.second;
-							}
+							Pair<BinaryTree<T>, Boolean> newSe = new Pair<BinaryTree<T>, Boolean>();
+							newSe.first = se.first;
+							newSe.second = false;
+							p.push(newSe);
+							newSe = new Pair<BinaryTree<T>, Boolean>();
+							newSe.first = se.first.right();
+							newSe.second = true;
+							p.push(newSe);
 						}
+					}
+				}
+			} else {
+				if (!se.first.isNil() && se.first.root().compareTo(x) > 0) {
+					if (r == null) {
+						r = se.first.root();
 					}
 				}
 			}
 		}
-		return sucAndP;
+		return r;
 	}
 
 	@Override
