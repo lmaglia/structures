@@ -1,0 +1,61 @@
+pred:ab(a) x a -> <a x bool>
+pred(t,x) =
+	if nil?(t) then
+		<undefined,false>
+	else
+		if raiz(t) = x then
+			<max(izq(t)),true>
+		else
+			if raiz(t) > x then
+				pred(izq(t),x)
+			else
+				if pi1(pred(der(t),x)) != undefined then
+					pred(der(t),x)
+				else
+					if pi2(pred(der(t),x)) then
+						<raiz(t),true>
+					else
+						<undefined,false>
+					fi
+				fi
+			fi
+		fi
+	fi
+f:<a x boolean> x a -> <a x boolean>
+f(r,x) = 
+	if pi1(r) != undefined then
+		r
+	else
+		if pi2(r) then
+			<x,true>
+		else
+			<undefined,false>
+		fi
+	fi
+
+pred(t,x) =
+	if nil?(t) then
+		<undefined,false>
+	else
+		if raiz(t) = x then
+			<max(izq(t)),true>
+		else
+			if raiz(t) > x then
+				pred(izq(t),x)
+			else
+				f(pred(der(t)),raiz(t))
+			fi
+		fi
+	fi
+	
+max:ab(a) -> a
+max(t) =
+	if nil?(t) then
+		undefined
+	else
+		if nil(der(t)) then
+			raiz(t)
+		else
+			max(der(t))
+		fi
+	fi				
