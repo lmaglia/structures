@@ -1,22 +1,52 @@
-suc:ab(a) x a -> a
+suc:ab(a) x a -> <a x bool>
 suc(t,x) =
 	if nil?(t) then
-		undefined
+		<undefined,false>
 	else
 		if raiz(t) = x then
-			min(der(t))
+			<min(der(t)),true>
 		else
 			if raiz(t) > x then
 				if suc(izq(t),x) != undefined then
 					suc(izq(t),x)
 				else
-					raiz(t)
+					if pi2(suc(izq(t))) then
+						<raiz(t),true>
+					else
+						<undefined,false>
+					fi
 				fi
 			else
 				suc(der(t),x)
 			fi
 		fi
+	fi =
+suc(t,x) =
+	if nil?(t) then
+		<undefined,false>
+	else
+		if raiz(t) = x then
+			<min(der(t)),true>
+		else
+			if raiz(t) > x then
+				f(suc(izq(t),x),raiz(t))				
+			else
+				suc(der(t),x)
+			fi
+		fi
+	fi 
+f:<a x boolean> x a -> <a x boolean>
+f(r,x) = 
+	if pi1(r) != undefined then
+		r
+	else
+		if pi2(r) then
+			<x,true>
+		else
+			<undefined,false>
+		fi
 	fi
+	
 min:ab(a) -> a
 min(t) = 
 	if nil?(t) then
@@ -29,186 +59,109 @@ min(t) =
 		fi
 	fi
 
-gSuc:ab(a) x boolean x a x a -> a
-gSuc(t,c,x,r) =
-	if c then
-		gSuc(t,false,x,suc(t,x))
+gSuc:pila(ab(a)) x boolean x a x < a x boolean> -> <a x boolean>
+gSuc(p,b,x,r) =
+	if vacia?(p) then
+		r
 	else
-		if raiz(t) > x then
-			if r != undefined
-				r
-			else
-				raiz(t)
+		if b then
+			if not nil?(top(p)) then
+				gSuc(desapilar(p),true,x, f(r,raiz(top(p))))
 			fi
 		else
-			r
+			gSuc(desapilar(p),true,x,suc(top(p),x))
 		fi
-	fi 
-	=
-	if c then
-		gSuc(t,false,x,suc(t,x)) = 
-		if nil?(t) then
-			gSuc(t,false,x,undefined)
+	fi = 
+	if vacia?(p) then
+		r
+	else
+		if b then
+			if not nil?(top(p)) then
+				gSuc(desapilar(p),true,x, f(r,raiz(top(p))))
+			fi
 		else
-			if raiz(t) = x then
-				gSuc(t,false,x, min(der(t)))
+			gSuc(desapilar(p),true,x,suc(top(p),x)) = 
+			if nil?(top(p)) then
+				gSuc(desapilar(p), true, x, <undefined, false>)
 			else
-				if raiz(t) > x then
-					if suc(izq(t),x) != undefined then
-						suc(izq(t),x)
+				if raiz(t) = x then
+					gSuc(despilar(p), true, x,<min(der(top(p))),true>)
+				else
+					if raiz(t) > x then
+						gSuc(desapilar(p), true, x, f(suc(izq(top(p)),x),raiz(top(p))) ) =
+						gSuc(p, true, x, suc(izq(top(p)))) =
+						gSuc(apilar(izq(top(p)),p), false, x, r)						
 					else
-						raiz(t)
-					fi =
-					gSuc(t,false,x,suc(izq(t),x)) =
-					gSuc(t,false,x, gSuc(izq(t), true, x, r))
-					
-				else
-					gSuc(t,false,x,suc(der(t),x)) =
-					gSuc(t,false,x,gSuc(der(t),true,x,r))
+						gSuc(desapilar(p), true, x, suc(der(top(p)),x)) =
+						gSuc(apilar(der(top(p)),desapilar(p)),false,x,r)
+					fi
 				fi
 			fi
-		fi
-	else
-		if !nil?(t) && raiz(t) > x then
-			if r != undefined
-				r
-			else
-				raiz(t)
-			fi
-		else
-			r
+				
 		fi
 	fi
- =
- gSuc(t,c,x,r) = 
- 	if c then		 
-		if nil?(t) then
-			gSuc(t,false,x,undefined)
+	if vacia?(p) then
+		r
+	else
+		if b then
+			if not nil?(top(p)) then
+				gSuc(desapilar(p),true,x, f(r,raiz(top(p))))
+			fi
 		else
-			if raiz(t) = x then
-				gSuc(t,false,x, min(der(t)))
+			gSuc(desapilar(p),true,x,suc(top(p),x)) = 
+			if nil?(top(p)) then
+				gSuc(desapilar(p), true, x, <undefined, false>)
 			else
-				if raiz(t) > x then					
-					gSuc(t,false,x, gSuc(izq(t), true, x, r))					
-				else					
-					gSuc(t,false,x,gSuc(der(t),true,x,r))
+				if raiz(t) = x then
+					gSuc(despilar(p), true, x,<min(der(top(p))),true>)
+				else
+					if raiz(t) > x then						
+						gSuc(apilar(izq(top(p)),p), false, x, r)						
+					else						
+						gSuc(apilar(der(top(p)),desapilar(p)),false,x,r)
+					fi
 				fi
 			fi
-		fi
-	else
-		if raiz(t) > x then
-			if r != undefined
-				r
-			else
-				raiz(t)
-			fi
-		else
-			r
+				
 		fi
 	fi
 	
-ggSuc:pila(<ab(a) x boolean>) x a x a -> a
-ggSuc(p,x,r) =
-	if vacia?(p) then
-		r
-	else
-		ggSuc(desapilar(p),x,gSuc(pi1(top(p)),pi2(top(p)),x,r))
-	fi
-	=
-	if vacia?(p) then
-		r
-	else
-		ggSuc(desapilar(p),x,gSuc(pi1(top(p)),pi2(top(p)),x,r) =
-		if pi2(top(p)) then		 
-			if nil?(pi1(top(p))) then
-				ggSuc(desapilar(p),x,gSuc(pi1(top(p)),false,x,undefined)) =
-				ggSuc(apilar(<pi1(top(p)),false>,desapilar(p)),x,undefined)				
-			else
-				if raiz(pi1(top(p))) = x then
-					ggSuc(desapilar(p),x,gSuc(pi1(top(p)),false,x, min(der(top(p))))) =
-					ggSuc(apilar(<pi1(top(p)),false>,desapilar(p)),x, min(der(top(p))))
-				else
-					if raiz(pi1(top(p))) > x then					
-						ggSuc(desapilar(p),x,gSuc(pi1(top(p)),false,x, gSuc(izq(pi1(top(p))), true, x, r)))=
-						ggSuc(apilar(<pi1(top(p)),false>,desapilar(p)),x,gSuc(izq(pi1(top(p))), true, x, r))) =
-						ggSuc(apilar(<izq(pi1(top(p))),true>,<pi1(top(p)),false>,desapilar(p)),x,r)					
-					else					
-						ggSuc(despilar(p),x,gSuc(pi1(top(p)),false,x,gSuc(der(pi1(top(p))),true,x,r))) =
-						ggSuc(apilar(<pi1(top(p)),false>,desapilar(p)),x,gSuc(der(pi1(top(p))),true,x,r)) =
-						ggSuc(apilar(<der(pi1(top(p))),true>,<pi1(top(p)),false>,desapilar(p)),x,r) 
-					fi
-				fi
-			fi
-		else
-			if raiz(top(p)) > x then
-				if r != undefined then
-					ggSuc(desapilar(p),x,r)
-				else
-					ggSuc(desapilar(p),x,raiz(pi1(top(p))))				
-				fi
-			else
-				ggSuc(desapilar(p),x,r)
-			fi
-		fi
-	fi
-	=
-	if vacia?(p) then
-		r
-	else		
-		if pi2(top(p)) then		 
-			if nil?(pi1(top(p))) then		
-				ggSuc(apilar(<pi1(top(p)),false>,desapilar(p)),x,undefined)				
-			else
-				if raiz(pi1(top(p))) = x then					
-					ggSuc(apilar(<pi1(top(p)),false>,desapilar(p)),x, min(der(top(p))))
-				else
-					if raiz(pi1(top(p))) > x then						
-						ggSuc(apilar(<izq(pi1(top(p))),true>,<pi1(top(p)),false>,desapilar(p)),x,r)					
-					else					
-						ggSuc(apilar(<der(pi1(top(p))),true>,<pi1(top(p)),false>,desapilar(p)),x,r) 
-					fi
-				fi
-			fi
-		else
-			if raiz(top(t)) > x then
-				if r != undefined then
-					ggSuc(desapilar(p),x,r)
-				else
-					ggSuc(desapilar(p),x,raiz(pi1(top(p))))				
-				fi
-			else
-				ggSuc(desapilar(p),x,r)
-			fi
-		fi
-	fi
+	gSuc(apilar(t,[]), false, x, <undefined,false>)
 	
-iGGSuc(t,x) =
-	p= apilar(<t,true>,[])
-	r= undefined
-	while !vacia?(p) do
-		top= desapilar(p)
-		if pi2(top) then		 
-			if nil?(pi1(top)) then		
-				p=apilar(<pi1(top),false>,p)
-				r= undefined				
-			else
-				if raiz(pi1(top)) = x then					
-					p= apilar(<pi1(top),false>,p)
-					r= min(der(top))
+	iGSuc(t,x)
+		p= apilar(t,[])
+		b= false
+		r= <undefined,false>
+		while not vacia?(p)
+			a= desapilar(p)
+			if b then
+				if not nil?(a) then
+					b= true
+					r= f(r,raiz(a)))
+				fi
+			else				 
+				if nil?(a) then
+					b= true
+					r= <undefined, false>
 				else
-					if raiz(pi1(top)) > x then						
-						p=apilar(<izq(pi1(top)),true>,<pi1(top),false>,p)					
-					else					
-						p= apilar(<der(pi1(top)),true>,<pi1(top),false>,p) 
+					if raiz(a) = x then
+						b= true
+						r= <min(der(top(p))),true>
+					else
+						if raiz(a) > x then	
+							p= apilar(a,p)					
+							p= apilar(izq(a),p)
+							b= false						
+						else						
+							p= apilar(der(a),p)
+							b= false
+						fi
 					fi
 				fi
+				
 			fi
-		else
-			if raiz(pi1(top)) > x then
-				if r = undefined then
-					r= raiz(pi1(top))				
-				fi
-			fi
-		fi
-	od
-	return r
+		end while	
+		return r
+	
+		
+	
