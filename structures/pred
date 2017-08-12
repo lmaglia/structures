@@ -58,4 +58,102 @@ max(t) =
 		else
 			max(der(t))
 		fi
-	fi				
+	fi
+gPred:pila(ab(a)) x boolean x a x < a x boolean > -> < a x boolean >
+gPred(p,b,x,r) =
+	if vacia?(p) then
+		r
+	else
+		if b then
+			if not nil?(top(p)) then
+				gPred(desapilar(p),true, x, f(pi1(r), raiz(top(p))))
+			fi
+		else
+			gPred(desapilar(p),true, x, pred(top(p),x))
+		fi
+	fi = 
+	if vacia?(p) then
+		r
+	else
+		if b then
+			if not nil?(top(p)) then
+				gPred(desapilar(p),true, x, f(pi1(r), raiz(top(p))))
+			fi
+		else
+			gPred(desapilar(p),true, x, pred(top(p),x)) =
+			if nil?(top(p)) then
+				gPred(desapilar(p), true, x, <undefined,false> )
+			else
+				if raiz(top(p)) = x then
+					gPred(desapilar(p), true, x, <max(izq(top(p))),true> )
+				else
+					if raiz(top(p)) > x then
+						gPred(desapilar(p), true, x, pred(izq(top(p)),x)) =
+						gPred(apilar(izq(top(p)),despilar(p)), false, x, r)
+					else
+						gPred(desapilar(p), true, x, f(pred(der(top(p)),x),raiz(top(p)))) = 
+						gPred(p, true, x, pred(der(top(p)),x)) =
+						gPred(apilar(der(top(p)),p),false,x, r)
+					fi
+				fi
+			fi
+		fi
+	fi
+	=
+	if vacia?(p) then
+		r
+	else
+		if b then
+			gPred(desapilar(p),true, x, f(pi1(r), raiz(top(p))))
+		else
+			gPred(desapilar(p),true, x, pred(top(p),x)) =
+			if nil?(top(p)) then
+				gPred(desapilar(p), true, x, <undefined,false> )
+			else
+				if raiz(top(p)) = x then
+					gPred(desapilar(p), true, x, <max(izq(top(p))),true> )
+				else
+					if raiz(top(p)) > x then		
+						gPred(apilar(izq(top(p)),despilar(p)), false, x, r)
+					else						
+						gPred(apilar(der(top(p)),p),false,x, r)
+					fi
+				fi
+			fi
+		fi
+	fi
+	
+	gPred(apilar(t,[]),false, x, undefined)
+	
+	iGPred(t,x)
+		b= false
+		r= undefined
+		p= apilar(t,[])
+		while not vacia?(p)
+			a= desapilar(p)
+			if b then
+				b=true
+				if not nil?(a) then				 
+					r= f(pi1(r), raiz(a))
+				fi
+			else				
+				if nil?(a) then
+					b= true
+					r= <undefined,false> 
+				else
+					if raiz(a) = x then
+						b= true
+						r= <max(izq(top(p))),true> 
+					else
+						if raiz(A) > x then		
+							p= apilar(izq(A),p)
+							b= false 
+						else
+							p= apilar(der(a),a,p)
+							b= false							
+						fi
+					fi
+				fi
+			fi 
+		end while
+					

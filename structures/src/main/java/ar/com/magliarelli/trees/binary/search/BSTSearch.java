@@ -112,8 +112,12 @@ public class BSTSearch<T extends Comparable<T>> implements Search<T> {
 	 */
 	@Override
 	public T maximum() {
+		return max(this.tree);
+	}
+
+	private T max(BinaryTree<T> t) {
 		BinaryTree<T> max = BinaryTree.nil();
-		BinaryTree<T> current = this.tree;
+		BinaryTree<T> current = t;
 		while (!current.isNil()) {
 			max = current;
 			current = current.right();
@@ -303,7 +307,8 @@ public class BSTSearch<T extends Comparable<T>> implements Search<T> {
 	 */
 	@Override
 	public T predecessor(T elem) {
-		return this.predecessor(this.tree, elem);
+		return this.iPredecessor(this.tree, elem).first;
+		// return this.predecessor(this.tree, elem);
 	}
 
 	private T predecessor(BinaryTree<T> aTree, T elem) {
@@ -408,6 +413,59 @@ public class BSTSearch<T extends Comparable<T>> implements Search<T> {
 						r = se.first.root();
 					}
 				}
+			}
+		}
+		return r;
+	}
+
+	private Pair<T, Boolean> iPredecessor(BinaryTree<T> t, T x) {
+		Pair<T, Boolean> r = new Pair<T, Boolean>();
+		r.first = null;
+		r.second = false;
+		Stack<BinaryTree<T>> p = new Stack<BinaryTree<T>>();
+		boolean b = false;
+		p.push(t);
+
+		while (!p.isEmpty()) {
+			BinaryTree<T> a = p.pop();
+			if (b) {
+				b = true;
+				if (!a.isNil()) {
+					r = f(r, a.root());
+				}
+			} else {
+				if (a.isNil()) {
+					b = true;
+					r.first = null;
+					r.second = false;
+				} else if (a.root().compareTo(x) == 0) {
+					b = true;
+					r.first = max(a.left());
+					r.second = true;
+				} else if (a.root().compareTo(x) > 0) {
+					p.push(a.left());
+					b = false;
+				} else {
+					p.push(a);
+					p.push(a.right());
+					b = false;
+				}
+			}
+
+		}
+		return r;
+	}
+
+	private Pair<T, Boolean> f(Pair<T, Boolean> t, T x) {
+		Pair<T, Boolean> r = t;
+		if (t.first == null) {
+			r = new Pair<T, Boolean>();
+			if (t.second) {
+				r.first = x;
+				r.second = true;
+			} else {
+				r.first = null;
+				r.second = false;
 			}
 		}
 		return r;
