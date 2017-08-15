@@ -12,6 +12,7 @@ import ar.com.magliarelli.trees.binary.BinaryTreeWithParent;
  *
  */
 public class AVLSearch<T extends Comparable<T>> implements Search<T> {
+	//BalanceFactor = tree.right().height()-tree.left.height() in [-1,0,1]
 	private BinaryTreeWithParent<BalancedNode<T>> tree;
 	private int size;
 
@@ -54,12 +55,42 @@ public class AVLSearch<T extends Comparable<T>> implements Search<T> {
 					parent.setRight(newTree);
 				}
 				//TODO we have to rebalance the tree
+				this.balance(newTree);
 			}
 		}else{
 			//current has the same key. We just update the value
 			current.root().value= elem;
 		}
 		return inserted;
+	}
+
+	private void balance(BinaryTreeWithParent<BalancedNode<T>> newTree) {
+		boolean balanced= false;
+		BinaryTreeWithParent<BalancedNode<T>> current= newTree;
+		while(current.parent()!=null && !balanced){
+			if(current.parent().right() == current){
+				this.balanceRight(current);
+			}else{
+				this.balanceLeft(current);
+			}
+			
+		}
+		
+	}
+
+	private void balanceLeft(BinaryTreeWithParent<AVLSearch<T>.BalancedNode<T>> current) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private void balanceRight(BinaryTreeWithParent<AVLSearch<T>.BalancedNode<T>> current) {
+		if(current.parent().root().balance > 0){
+			//Do Rotation
+		}else if (current.parent().root().balance == 0){
+			current.parent().root().balance++;
+		}else{
+			current.parent().root().balance++;
+		}
 	}
 
 	@Override
