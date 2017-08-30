@@ -83,16 +83,40 @@ public class AVLSearch<T extends Comparable<T>> implements Search<T> {
 		
 	}
 
-	private void balanceRight(BinaryTreeWithParent<AVLSearch<T>.BalancedNode<T>> current) {
+	private BinaryTreeWithParent<BalancedNode<T>> balanceRight(BinaryTreeWithParent<AVLSearch<T>.BalancedNode<T>> current) {
+		BinaryTreeWithParent<BalancedNode<T>> next= null;
 		if(current.parent().root().balance > 0){
 			//Do Rotation
-		}else if (current.parent().root().balance == 0){
-			current.parent().root().balance++;
 		}else{
 			current.parent().root().balance++;
+			if(current.parent().root().balance >0 ){
+				next= current.parent();
+			}			
 		}
+		return next;
 	}
-
+	private BinaryTreeWithParent<BalancedNode<T>> rotateRL(BinaryTreeWithParent<BalancedNode<T>> x, BinaryTreeWithParent<BalancedNode<T>> z) {
+		BinaryTreeWithParent<BalancedNode<T>> xParent= x.parent();
+		BinaryTreeWithParent<BalancedNode<T>> lz= z.left();
+		z.setLeft(lz.right());
+		lz.setRight(z);
+		x.setRight(lz.left());
+		lz.setLeft(x);
+		lz.setParent(xParent);
+		//TODO update balance factors
+		return lz;
+	}
+	
+	private BinaryTreeWithParent<BalancedNode<T>> rotateL(BinaryTreeWithParent<BalancedNode<T>> x, BinaryTreeWithParent<BalancedNode<T>> z) {
+		BinaryTreeWithParent<BalancedNode<T>> xParent= x.parent();
+		BinaryTreeWithParent<BalancedNode<T>> lz= z.left();
+		z.setLeft(x);
+		x.setRight(lz);		
+		z.setParent(xParent);
+		//TODO update balance factors
+		return z;
+	}
+	
 	@Override
 	public T search(T elem) {
 		BinaryTreeWithParent<BalancedNode<T>> current = this.tree;
