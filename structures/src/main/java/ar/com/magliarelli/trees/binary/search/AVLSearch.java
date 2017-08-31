@@ -102,8 +102,18 @@ public class AVLSearch<T extends Comparable<T>> implements Search<T> {
 		lz.setRight(z);
 		x.setRight(lz.left());
 		lz.setLeft(x);
-		lz.setParent(xParent);
-		//TODO update balance factors
+		lz.setParent(xParent);		
+		if(lz.root().balance == 0){
+			x.root().balance= 0;
+			z.root().balance= 0;
+		}else if (lz.root().balance > 0){
+			z.root().balance= 0;
+			x.root().balance= -1;
+		}else{
+			x.root().balance= 0;
+			z.root().balance= 1;
+		}
+		lz.root().balance= 0;
 		return lz;
 	}
 	
@@ -112,8 +122,52 @@ public class AVLSearch<T extends Comparable<T>> implements Search<T> {
 		BinaryTreeWithParent<BalancedNode<T>> lz= z.left();
 		z.setLeft(x);
 		x.setRight(lz);		
-		z.setParent(xParent);
-		//TODO update balance factors
+		z.setParent(xParent);		
+		if(z.root().balance == 0){
+			x.root().balance= 1;
+			z.root().balance=-1;
+		}else{
+			x.root().balance= 0;
+			z.root().balance=0;
+		}
+		return z;
+	}
+	
+	private BinaryTreeWithParent<BalancedNode<T>> rotateLR(BinaryTreeWithParent<BalancedNode<T>> x, BinaryTreeWithParent<BalancedNode<T>> z) {
+		BinaryTreeWithParent<BalancedNode<T>> xParent= x.parent();
+		BinaryTreeWithParent<BalancedNode<T>> rz= z.right();
+		z.setRight(rz.left());
+		rz.setLeft(z);
+		x.setLeft(rz.right());
+		rz.setRight(x);
+		rz.setParent(xParent);		
+		if(rz.root().balance == 0){
+			x.root().balance= 0;
+			z.root().balance= 0;
+		}else if (rz.root().balance > 0){
+			z.root().balance= 0;
+			x.root().balance= -1;
+		}else{
+			x.root().balance= 0;
+			z.root().balance= 1;
+		}
+		rz.root().balance= 0;
+		return rz;
+	}
+	
+	private BinaryTreeWithParent<BalancedNode<T>> rotateR(BinaryTreeWithParent<BalancedNode<T>> x, BinaryTreeWithParent<BalancedNode<T>> z) {
+		BinaryTreeWithParent<BalancedNode<T>> xParent= x.parent();
+		BinaryTreeWithParent<BalancedNode<T>> rz= z.right();
+		z.setRight(x);
+		x.setLeft(rz);		
+		z.setParent(xParent);		
+		if(z.root().balance == 0){
+			x.root().balance= -1;
+			z.root().balance=1;
+		}else{
+			x.root().balance= 0;
+			z.root().balance=0;
+		}
 		return z;
 	}
 	
