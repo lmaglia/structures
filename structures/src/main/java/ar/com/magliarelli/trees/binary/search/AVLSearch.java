@@ -145,11 +145,11 @@ public class AVLSearch<T extends Comparable<T>> implements Search<T> {
 			x.root().balance= 0;
 			z.root().balance= 0;
 		}else if (rz.root().balance > 0){
-			z.root().balance= 0;
-			x.root().balance= -1;
-		}else{
+			z.root().balance= -1;
 			x.root().balance= 0;
-			z.root().balance= 1;
+		}else{
+			x.root().balance= 1;
+			z.root().balance= 0;
 		}
 		rz.root().balance= 0;
 		return rz;
