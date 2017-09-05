@@ -54,8 +54,8 @@ public class AVLSearch<T extends Comparable<T>> implements Search<T> {
 				} else {
 					parent.setRight(newTree);
 				}
-				
-				//TODO we might have to update this.tree
+
+				// TODO we might have to update this.tree
 				this.balance(newTree);
 			}
 		} else {
@@ -68,11 +68,14 @@ public class AVLSearch<T extends Comparable<T>> implements Search<T> {
 	private void balance(BinaryTreeWithParent<BalancedNode<T>> newTree) {
 		BinaryTreeWithParent<BalancedNode<T>> current = newTree;
 		while (current != null && current.parent() != null) {
-			
+			boolean updateRoot= (current.parent() == this.tree);
 			if (current.parent().right() == current) {
 				current = this.balanceRight(current);
 			} else {
 				current = this.balanceLeft(current);
+			}
+			if(updateRoot){
+				this.tree= current;
 			}
 		}
 
@@ -89,7 +92,12 @@ public class AVLSearch<T extends Comparable<T>> implements Search<T> {
 			} else {
 				n = this.rotateR(x, z);
 			}
-			next.setLeft(n);
+			if (next != null) {
+				next.setLeft(n);
+			} else {
+				//We have to update this.tree
+				next = n;
+			}
 		} else {
 			x.root().balance--;
 			if (x.root().balance < 0) {
@@ -111,7 +119,12 @@ public class AVLSearch<T extends Comparable<T>> implements Search<T> {
 			} else {
 				n = this.rotateL(x, z);
 			}
-			next.setRight(n);
+			if (next != null) {
+				next.setRight(n);
+			} else {
+				// We have to update this.tree
+				next = n;
+			}
 		} else {
 			x.root().balance++;
 			if (x.root().balance > 0) {
@@ -255,20 +268,20 @@ public class AVLSearch<T extends Comparable<T>> implements Search<T> {
 
 	@Override
 	public T delete(T elem) {
-		T removed = null;		
+		T removed = null;
 		BinaryTreeWithParent<BalancedNode<T>> current = this.tree;
 		while (!current.isNil() && current.root().compareTo(elem) != 0) {
-			if(current.root().compareTo(elem) > 0){
-				current= current.left();
-			}else{
-				current= current.right();
+			if (current.root().compareTo(elem) > 0) {
+				current = current.left();
+			} else {
+				current = current.right();
 			}
 		}
-		if(!current.isNil()){
-			removed= current.root().value;
+		if (!current.isNil()) {
+			removed = current.root().value;
 			this.size--;
-			if(current.isLeaf()){
-				
+			if (current.isLeaf()) {
+
 			}
 		}
 		return removed;
