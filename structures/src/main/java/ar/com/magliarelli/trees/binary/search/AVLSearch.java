@@ -281,7 +281,53 @@ public class AVLSearch<T extends Comparable<T>> implements Search<T> {
 			removed = current.root().value;
 			this.size--;
 			if (current.isLeaf()) {
-
+				if(current == this.tree){
+					this.tree= BinaryTreeWithParent.nil();
+				}else{
+					BinaryTreeWithParent<BalancedNode<T>> parent= current.parent();
+					if(parent.left() == current){
+						parent.setLeft(BinaryTreeWithParent.nil());
+					}else{
+						parent.setRight(BinaryTreeWithParent.nil());
+					}
+				}
+				
+			}else if(current.right().isNil()){
+				if(current == this.tree){
+					this.tree= current.left();
+					this.tree.setParent(null);
+				}else{
+					BinaryTreeWithParent<BalancedNode<T>> parent= current.parent();
+					if(parent.left() == current){
+						parent.setLeft(current.left());
+					}else{
+						parent.setRight(current.left());
+					}
+				}
+			}else if (current.left().isNil()){
+				if(current == this.tree){
+					this.tree= current.right();
+					this.tree.setParent(null);
+				}else{
+					BinaryTreeWithParent<BalancedNode<T>> parent= current.parent();
+					if(parent.left() == current){
+						parent.setLeft(current.right());
+					}else{
+						parent.setRight(current.right());
+					}
+				}
+			}else{
+				BinaryTreeWithParent<BalancedNode<T>> min= current.right();
+				while(!min.left().isNil()){
+					min= min.left();
+				}
+				current.root().value= min.root().value;
+				BinaryTreeWithParent<BalancedNode<T>> minParent= min.parent();
+				if(minParent.right() == min){
+					minParent.setRight(min.right());
+				}else{
+					minParent.setLeft(min.right());
+				}
 			}
 		}
 		return removed;
