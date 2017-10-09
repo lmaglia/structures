@@ -68,14 +68,10 @@ public class AVLSearch<T extends Comparable<T>> implements Search<T> {
 	private void balance(BinaryTreeWithParent<BalancedNode<T>> newTree) {
 		BinaryTreeWithParent<BalancedNode<T>> current = newTree;
 		while (current != null && current.parent() != null) {
-			boolean updateRoot= (current.parent() == this.tree);
 			if (current.parent().right() == current) {
 				current = this.balanceRight(current);
 			} else {
 				current = this.balanceLeft(current);
-			}
-			if(updateRoot){
-				this.tree= current;
 			}
 		}
 
@@ -95,8 +91,7 @@ public class AVLSearch<T extends Comparable<T>> implements Search<T> {
 			if (next != null) {
 				next.setLeft(n);
 			} else {
-				//We have to update this.tree
-				next = n;
+				this.tree = n;
 			}
 		} else {
 			x.root().balance--;
@@ -122,8 +117,7 @@ public class AVLSearch<T extends Comparable<T>> implements Search<T> {
 			if (next != null) {
 				next.setRight(n);
 			} else {
-				// We have to update this.tree
-				next = n;
+				this.tree = n;
 			}
 		} else {
 			x.root().balance++;
@@ -281,52 +275,64 @@ public class AVLSearch<T extends Comparable<T>> implements Search<T> {
 			removed = current.root().value;
 			this.size--;
 			if (current.isLeaf()) {
-				if(current == this.tree){
-					this.tree= BinaryTreeWithParent.nil();
-				}else{
-					BinaryTreeWithParent<BalancedNode<T>> parent= current.parent();
-					if(parent.left() == current){
+				if (current == this.tree) {
+					this.tree = BinaryTreeWithParent.nil();
+				} else {
+					BinaryTreeWithParent<BalancedNode<T>> parent = current.parent();
+					if (parent.left() == current) {
 						parent.setLeft(BinaryTreeWithParent.nil());
-					}else{
+						this.balance(parent.right()); // We can think this as we
+														// added a node to right
+														// side instead of
+														// removing from left.
+														// Thus, we can reuse
+					} else {
 						parent.setRight(BinaryTreeWithParent.nil());
+						this.balance(parent.left());
 					}
 				}
-				
-			}else if(current.right().isNil()){
-				if(current == this.tree){
-					this.tree= current.left();
+
+			} else if (current.right().isNil()) {
+				if (current == this.tree) {
+					this.tree = current.left();
 					this.tree.setParent(null);
-				}else{
-					BinaryTreeWithParent<BalancedNode<T>> parent= current.parent();
-					if(parent.left() == current){
+				} else {
+					BinaryTreeWithParent<BalancedNode<T>> parent = current.parent();
+					if (parent.left() == current) {
 						parent.setLeft(current.left());
-					}else{
+						this.balance(parent.right());
+					} else {
 						parent.setRight(current.left());
+						this.balance(parent.left());
 					}
 				}
-			}else if (current.left().isNil()){
-				if(current == this.tree){
-					this.tree= current.right();
+			} else if (current.left().isNil()) {
+				if (current == this.tree) {
+					this.tree = current.right();
 					this.tree.setParent(null);
-				}else{
-					BinaryTreeWithParent<BalancedNode<T>> parent= current.parent();
-					if(parent.left() == current){
+				} else {
+					BinaryTreeWithParent<BalancedNode<T>> parent = current.parent();
+					if (parent.left() == current) {
 						parent.setLeft(current.right());
-					}else{
+						this.balance(parent.right());
+					} else {
 						parent.setRight(current.right());
+						this.balance(parent.left());
 					}
 				}
-			}else{
-				BinaryTreeWithParent<BalancedNode<T>> min= current.right();
-				while(!min.left().isNil()){
-					min= min.left();
+			} else {
+				BinaryTreeWithParent<BalancedNode<T>> min = current.right();
+				while (!min.left().isNil()) {
+					min = min.left();
 				}
-				current.root().value= min.root().value;
-				BinaryTreeWithParent<BalancedNode<T>> minParent= min.parent();
-				if(minParent.right() == min){
+				current.root().value = min.root().value;
+				BinaryTreeWithParent<BalancedNode<T>> minParent = min.parent();
+				if (minParent.right() == min) {
 					minParent.setRight(min.right());
-				}else{
+					this.balance(minParent.left());
+				} else {
 					minParent.setLeft(min.right());
+					this.balance(minParent.right());
 				}
 			}
 		}
@@ -364,8 +370,14 @@ public class AVLSearch<T extends Comparable<T>> implements Search<T> {
 			suc = min(current.right());
 			if (suc == null) {
 				BinaryTreeWithParent<BalancedNode<T>> parent = current.parent();
-				if (parent != null && parent.left() == current) {
-					suc = parent.root().value;
+				if (parent != null) {
+					if (parent.left() == current) {
+						suc = parent.root().value;
+					} else {
+						if (parent.parent() != null && parent.parent().left() == parent) {
+							suc = parent.parent().root().value;
+						}
+					}
 				}
 			}
 		}
@@ -387,8 +399,14 @@ public class AVLSearch<T extends Comparable<T>> implements Search<T> {
 			pred = max(current.left());
 			if (pred == null) {
 				BinaryTreeWithParent<BalancedNode<T>> parent = current.parent();
-				if (parent != null && parent.right() == current) {
-					pred = parent.root().value;
+				if (parent != null) {
+					if (parent.right() == current) {
+						pred = parent.root().value;
+					} else {
+						if (parent.parent() != null && parent.parent().right() == parent) {
+							pred = parent.parent().root().value;
+						}
+					}
 				}
 			}
 		}
