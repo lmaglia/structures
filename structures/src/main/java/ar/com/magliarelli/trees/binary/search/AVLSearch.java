@@ -13,7 +13,7 @@ import ar.com.magliarelli.trees.binary.BinaryTreeWithParent;
  */
 public class AVLSearch<T extends Comparable<T>> implements Search<T> {
 	// BalanceFactor = tree.right().height()-tree.left.height() in [-1,0,1]
-	private BinaryTreeWithParent<BalancedNode<T>> tree;
+	private BinaryTreeWithParent<BalancedNode> tree;
 	private int size;
 
 	public AVLSearch() {
@@ -23,32 +23,25 @@ public class AVLSearch<T extends Comparable<T>> implements Search<T> {
 
 	@Override
 	public Iterator<T> iterator() {
-		return this.new IteratorWrapper<T>(this.tree.iterator());
+		return this.new IteratorWrapper(this.tree.iterator());
 	}
 
 	@Override
 	public boolean insert(T elem) {
-		BalancedNode<T> node = new BalancedNode<T>();
+		BalancedNode node = new BalancedNode();
 		node.value = elem;
 		boolean inserted = false;
 
-		BinaryTreeWithParent<BalancedNode<T>> current = this.tree;
-		while (!current.isNil() && current.root().compareTo(elem) != 0) {
-			if (current.root().compareTo(elem) > 0) {
-				current = current.left();
-			} else {
-				current = current.right();
-			}
-		}
+		BinaryTreeWithParent<BalancedNode> current = this.find(this.tree, elem);		
 		if (current.isNil()) {
 			node.balance = 0;
 			inserted = true;
 			this.size++;
-			BinaryTreeWithParent<BalancedNode<T>> newTree = BinaryTreeWithParent.leaf(node);
+			BinaryTreeWithParent<BalancedNode> newTree = BinaryTreeWithParent.leaf(node);
 			if (this.tree.isNil()) {
 				this.tree = newTree;
 			} else {
-				BinaryTreeWithParent<BalancedNode<T>> parent = current.parent();
+				BinaryTreeWithParent<BalancedNode> parent = current.parent();
 				if (parent.left() == current) {
 					parent.setLeft(newTree);
 				} else {
@@ -65,8 +58,8 @@ public class AVLSearch<T extends Comparable<T>> implements Search<T> {
 		return inserted;
 	}
 
-	private void balance(BinaryTreeWithParent<BalancedNode<T>> newTree) {
-		BinaryTreeWithParent<BalancedNode<T>> current = newTree;
+	private void balance(BinaryTreeWithParent<BalancedNode>	newTree) {
+		BinaryTreeWithParent<BalancedNode> current = newTree;
 		while (current != null && current.parent() != null) {
 			if (current.parent().right() == current) {
 				current = this.balanceRight(current);
@@ -77,12 +70,12 @@ public class AVLSearch<T extends Comparable<T>> implements Search<T> {
 
 	}
 
-	private BinaryTreeWithParent<BalancedNode<T>> balanceLeft(BinaryTreeWithParent<AVLSearch<T>.BalancedNode<T>> z) {
-		BinaryTreeWithParent<BalancedNode<T>> next = null;
-		BinaryTreeWithParent<BalancedNode<T>> x = z.parent();
+	private BinaryTreeWithParent<BalancedNode> balanceLeft(BinaryTreeWithParent<AVLSearch<T>.BalancedNode> z) {
+		BinaryTreeWithParent<BalancedNode> next = null;
+		BinaryTreeWithParent<BalancedNode> x = z.parent();
 		if (x.root().balance < 0) {
 			next = x.parent();
-			BinaryTreeWithParent<BalancedNode<T>> n = null;
+			BinaryTreeWithParent<BalancedNode> n = null;
 			if (z.root().balance > 0) {
 				n = this.rotateLR(x, z);
 			} else {
@@ -103,12 +96,12 @@ public class AVLSearch<T extends Comparable<T>> implements Search<T> {
 
 	}
 
-	private BinaryTreeWithParent<BalancedNode<T>> balanceRight(BinaryTreeWithParent<AVLSearch<T>.BalancedNode<T>> z) {
-		BinaryTreeWithParent<BalancedNode<T>> next = null;
-		BinaryTreeWithParent<BalancedNode<T>> x = z.parent();
+	private BinaryTreeWithParent<BalancedNode> balanceRight(BinaryTreeWithParent<AVLSearch<T>.BalancedNode> z) {
+		BinaryTreeWithParent<BalancedNode> next = null;
+		BinaryTreeWithParent<BalancedNode> x = z.parent();
 		if (x.root().balance > 0) {
 			next = x.parent();
-			BinaryTreeWithParent<BalancedNode<T>> n = null;
+			BinaryTreeWithParent<BalancedNode> n = null;
 			if (z.root().balance < 0) {
 				n = this.rotateRL(x, z);
 			} else {
@@ -128,10 +121,10 @@ public class AVLSearch<T extends Comparable<T>> implements Search<T> {
 		return next;
 	}
 
-	private BinaryTreeWithParent<BalancedNode<T>> rotateRL(BinaryTreeWithParent<BalancedNode<T>> x,
-			BinaryTreeWithParent<BalancedNode<T>> z) {
-		BinaryTreeWithParent<BalancedNode<T>> xParent = x.parent();
-		BinaryTreeWithParent<BalancedNode<T>> lz = z.left();
+	private BinaryTreeWithParent<BalancedNode> rotateRL(BinaryTreeWithParent<BalancedNode> x,
+			BinaryTreeWithParent<BalancedNode> z) {
+		BinaryTreeWithParent<BalancedNode> xParent = x.parent();
+		BinaryTreeWithParent<BalancedNode> lz = z.left();
 		z.setLeft(lz.right());
 		lz.setRight(z);
 		x.setRight(lz.left());
@@ -151,10 +144,10 @@ public class AVLSearch<T extends Comparable<T>> implements Search<T> {
 		return lz;
 	}
 
-	private BinaryTreeWithParent<BalancedNode<T>> rotateL(BinaryTreeWithParent<BalancedNode<T>> x,
-			BinaryTreeWithParent<BalancedNode<T>> z) {
-		BinaryTreeWithParent<BalancedNode<T>> xParent = x.parent();
-		BinaryTreeWithParent<BalancedNode<T>> lz = z.left();
+	private BinaryTreeWithParent<BalancedNode> rotateL(BinaryTreeWithParent<BalancedNode> x,
+			BinaryTreeWithParent<BalancedNode> z) {
+		BinaryTreeWithParent<BalancedNode> xParent = x.parent();
+		BinaryTreeWithParent<BalancedNode> lz = z.left();
 		z.setLeft(x);
 		x.setRight(lz);
 		z.setParent(xParent);
@@ -168,10 +161,10 @@ public class AVLSearch<T extends Comparable<T>> implements Search<T> {
 		return z;
 	}
 
-	private BinaryTreeWithParent<BalancedNode<T>> rotateLR(BinaryTreeWithParent<BalancedNode<T>> x,
-			BinaryTreeWithParent<BalancedNode<T>> z) {
-		BinaryTreeWithParent<BalancedNode<T>> xParent = x.parent();
-		BinaryTreeWithParent<BalancedNode<T>> rz = z.right();
+	private BinaryTreeWithParent<BalancedNode> rotateLR(BinaryTreeWithParent<BalancedNode> x,
+			BinaryTreeWithParent<BalancedNode> z) {
+		BinaryTreeWithParent<BalancedNode> xParent = x.parent();
+		BinaryTreeWithParent<BalancedNode> rz = z.right();
 		z.setRight(rz.left());
 		rz.setLeft(z);
 		x.setLeft(rz.right());
@@ -191,10 +184,10 @@ public class AVLSearch<T extends Comparable<T>> implements Search<T> {
 		return rz;
 	}
 
-	private BinaryTreeWithParent<BalancedNode<T>> rotateR(BinaryTreeWithParent<BalancedNode<T>> x,
-			BinaryTreeWithParent<BalancedNode<T>> z) {
-		BinaryTreeWithParent<BalancedNode<T>> xParent = x.parent();
-		BinaryTreeWithParent<BalancedNode<T>> rz = z.right();
+	private BinaryTreeWithParent<BalancedNode> rotateR(BinaryTreeWithParent<BalancedNode> x,
+			BinaryTreeWithParent<BalancedNode> z) {
+		BinaryTreeWithParent<BalancedNode> xParent = x.parent();
+		BinaryTreeWithParent<BalancedNode> rz = z.right();
 		z.setRight(x);
 		x.setLeft(rz);
 		z.setParent(xParent);
@@ -210,20 +203,10 @@ public class AVLSearch<T extends Comparable<T>> implements Search<T> {
 
 	@Override
 	public T search(T elem) {
-		BinaryTreeWithParent<BalancedNode<T>> current = this.tree;
-		BalancedNode<T> found = null;
-		while (!current.isNil() && found == null) {
-			if (current.root().compareTo(elem) == 0) {
-				found = current.root();
-			} else if (current.root().compareTo(elem) > 0) {
-				current = current.left();
-			} else {
-				current = current.right();
-			}
-		}
-		T elemFound = null;
-		if (found != null) {
-			elemFound = found.value;
+		BinaryTreeWithParent<BalancedNode> current = this.find(this.tree,elem);
+		T elemFound= null;
+		if(!current.isNil()){
+			elemFound= current.root().value;
 		}
 		return elemFound;
 	}
@@ -233,7 +216,7 @@ public class AVLSearch<T extends Comparable<T>> implements Search<T> {
 		return max(this.tree);
 	}
 
-	private T max(BinaryTreeWithParent<BalancedNode<T>> current) {
+	private T max(BinaryTreeWithParent<BalancedNode> current) {
 		T max = null;
 		if (!current.isNil()) {
 			while (!current.right().isNil()) {
@@ -249,7 +232,7 @@ public class AVLSearch<T extends Comparable<T>> implements Search<T> {
 		return min(this.tree);
 	}
 
-	private T min(BinaryTreeWithParent<BalancedNode<T>> current) {
+	private T min(BinaryTreeWithParent<BalancedNode> current) {
 		T min = null;
 		if (!current.isNil()) {
 			while (!current.left().isNil()) {
@@ -263,14 +246,8 @@ public class AVLSearch<T extends Comparable<T>> implements Search<T> {
 	@Override
 	public T delete(T elem) {
 		T removed = null;
-		BinaryTreeWithParent<BalancedNode<T>> current = this.tree;
-		while (!current.isNil() && current.root().compareTo(elem) != 0) {
-			if (current.root().compareTo(elem) > 0) {
-				current = current.left();
-			} else {
-				current = current.right();
-			}
-		}
+		BinaryTreeWithParent<BalancedNode> current = this.find(this.tree,elem);
+		
 		if (!current.isNil()) {
 			removed = current.root().value;
 			this.size--;
@@ -278,7 +255,7 @@ public class AVLSearch<T extends Comparable<T>> implements Search<T> {
 				if (current == this.tree) {
 					this.tree = BinaryTreeWithParent.nil();
 				} else {
-					BinaryTreeWithParent<BalancedNode<T>> parent = current.parent();
+					BinaryTreeWithParent<BalancedNode> parent = current.parent();
 					if (parent.left() == current) {
 						parent.setLeft(BinaryTreeWithParent.nil());
 						this.balance(parent.right()); // We can think this as we
@@ -297,7 +274,7 @@ public class AVLSearch<T extends Comparable<T>> implements Search<T> {
 					this.tree = current.left();
 					this.tree.setParent(null);
 				} else {
-					BinaryTreeWithParent<BalancedNode<T>> parent = current.parent();
+					BinaryTreeWithParent<BalancedNode> parent = current.parent();
 					if (parent.left() == current) {
 						parent.setLeft(current.left());
 						this.balance(parent.right());
@@ -311,7 +288,7 @@ public class AVLSearch<T extends Comparable<T>> implements Search<T> {
 					this.tree = current.right();
 					this.tree.setParent(null);
 				} else {
-					BinaryTreeWithParent<BalancedNode<T>> parent = current.parent();
+					BinaryTreeWithParent<BalancedNode> parent = current.parent();
 					if (parent.left() == current) {
 						parent.setLeft(current.right());
 						this.balance(parent.right());
@@ -321,12 +298,12 @@ public class AVLSearch<T extends Comparable<T>> implements Search<T> {
 					}
 				}
 			} else {
-				BinaryTreeWithParent<BalancedNode<T>> min = current.right();
+				BinaryTreeWithParent<BalancedNode> min = current.right();
 				while (!min.left().isNil()) {
 					min = min.left();
 				}
 				current.root().value = min.root().value;
-				BinaryTreeWithParent<BalancedNode<T>> minParent = min.parent();
+				BinaryTreeWithParent<BalancedNode> minParent = min.parent();
 				if (minParent.right() == min) {
 					minParent.setRight(min.right());
 					this.balance(minParent.left());
@@ -340,36 +317,19 @@ public class AVLSearch<T extends Comparable<T>> implements Search<T> {
 	}
 
 	@Override
-	public boolean contains(T elem) {
-		boolean found = false;
-		BinaryTreeWithParent<BalancedNode<T>> current = this.tree;
-		while (!current.isNil() && !found) {
-			if (current.root().compareTo(elem) == 0) {
-				found = true;
-			} else if (current.root().compareTo(elem) > 0) {
-				current = current.left();
-			} else {
-				current = current.right();
-			}
-		}
-		return found;
+	public boolean contains(T elem) {		
+		BinaryTreeWithParent<BalancedNode> current = this.find(this.tree,elem);		
+		return !current.isNil();
 	}
 
 	@Override
 	public T successor(T elem) {
 		T suc = null;
-		BinaryTreeWithParent<BalancedNode<T>> current = this.tree;
-		while (!current.isNil() && current.root().compareTo(elem) != 0) {
-			if (current.root().compareTo(elem) > 0) {
-				current = current.left();
-			} else {
-				current = current.right();
-			}
-		}
+		BinaryTreeWithParent<BalancedNode> current = this.find(this.tree,elem);		
 		if (!current.isNil()) {
 			suc = min(current.right());
 			if (suc == null) {
-				BinaryTreeWithParent<BalancedNode<T>> parent = current.parent();
+				BinaryTreeWithParent<BalancedNode> parent = current.parent();
 				if (parent != null) {
 					if (parent.left() == current) {
 						suc = parent.root().value;
@@ -387,18 +347,11 @@ public class AVLSearch<T extends Comparable<T>> implements Search<T> {
 	@Override
 	public T predecessor(T elem) {
 		T pred = null;
-		BinaryTreeWithParent<BalancedNode<T>> current = this.tree;
-		while (!current.isNil() && current.root().compareTo(elem) != 0) {
-			if (current.root().compareTo(elem) > 0) {
-				current = current.left();
-			} else {
-				current = current.right();
-			}
-		}
+		BinaryTreeWithParent<BalancedNode> current = this.find(this.tree,elem);		
 		if (!current.isNil()) {
 			pred = max(current.left());
 			if (pred == null) {
-				BinaryTreeWithParent<BalancedNode<T>> parent = current.parent();
+				BinaryTreeWithParent<BalancedNode> parent = current.parent();
 				if (parent != null) {
 					if (parent.right() == current) {
 						pred = parent.root().value;
@@ -418,7 +371,19 @@ public class AVLSearch<T extends Comparable<T>> implements Search<T> {
 		return this.size;
 	}
 
-	private class BalancedNode<T extends Comparable<T>> implements Comparable<T> {
+	private BinaryTreeWithParent<BalancedNode> find(BinaryTreeWithParent<BalancedNode> t, T elem) {
+		BinaryTreeWithParent<BalancedNode> current = t;
+		while (!current.isNil() && current.root().compareTo(elem) != 0) {
+			if (current.root().compareTo(elem) > 0) {
+				current = current.left();
+			} else {
+				current = current.right();
+			}
+		}
+		return current;
+	}
+
+	private class BalancedNode implements Comparable<T> {
 		public T value;
 		public int balance;
 
@@ -429,10 +394,10 @@ public class AVLSearch<T extends Comparable<T>> implements Search<T> {
 
 	}
 
-	private class IteratorWrapper<T extends Comparable<T>> implements Iterator<T> {
-		private Iterator<BalancedNode<T>> it;
+	private class IteratorWrapper implements Iterator<T> {
+		private Iterator<BalancedNode> it;
 
-		public IteratorWrapper(Iterator<BalancedNode<T>> it) {
+		public IteratorWrapper(Iterator<BalancedNode> it) {
 			this.it = it;
 		}
 
@@ -443,7 +408,7 @@ public class AVLSearch<T extends Comparable<T>> implements Search<T> {
 
 		@Override
 		public T next() {
-			BalancedNode<T> theNext = this.it.next();
+			BalancedNode theNext = this.it.next();
 			return theNext.value;
 		}
 
