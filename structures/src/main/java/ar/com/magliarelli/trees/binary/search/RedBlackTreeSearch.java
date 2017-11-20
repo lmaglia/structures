@@ -5,8 +5,6 @@ package ar.com.magliarelli.trees.binary.search;
 
 import java.util.Iterator;
 
-import javax.swing.plaf.basic.BasicBorders.RadioButtonBorder;
-
 import ar.com.magliarelli.trees.binary.BinaryTreeWithParent;
 
 /**
@@ -91,13 +89,135 @@ public class RedBlackTreeSearch<T extends Comparable<T>> implements Search<T> {
 
 	@Override
 	public T delete(T elem) {
-		BinaryTreeWithParent<RBNode<T>> toRemove= this.find(this.tree, elem);
-		T removed= null;
-		if(toRemove!= null && !toRemove.isNil()){
+		BinaryTreeWithParent<RBNode<T>> toRemove = this.find(this.tree, elem);
+		T removed = null;
+		if (toRemove != null && !toRemove.isNil()) {
 			this.size--;
-			removed= toRemove.root().value;
+			removed = toRemove.root().value;
+			BinaryTreeWithParent<RBNode<T>> m = this.min(toRemove.right());
+			if (m == null || m.isNil()) {
+				m = this.max(toRemove.left());
+			}
+			if (m != null && !m.isNil()) {
+				toRemove.root().value = m.root().value;
+				deleteOneChild(m);
+			}else{
+				deleteOneChild(toRemove);
+			}
 		}
 		return removed;
+	}
+
+	private void deleteOneChild(BinaryTreeWithParent<RBNode<T>> m) {
+		BinaryTreeWithParent<RBNode<T>> c = m.left().isNil() ? m.right() : m.left();
+		this.replaceNode(m, c);
+		if (m.root().color.equals(Color.BLACK)) {
+			if (!c.isNil() && c.root().color.equals(Color.RED)) {
+				c.root().color = Color.BLACK;
+			} else {
+				deleteCase1(c);
+			}
+		}
+	}
+
+	private void deleteCase1(BinaryTreeWithParent<RBNode<T>> c) {
+		if (c.parent() != null) {
+			deleteCase2(c);
+		}
+
+	}
+
+	private void deleteCase2(BinaryTreeWithParent<RBNode<T>> c) {
+		BinaryTreeWithParent<RBNode<T>> s = this.sibiling(c);
+		if (!s.isNil() && s.root().color.equals(Color.RED)) {
+			c.parent().root().color = Color.RED;
+			s.root().color = Color.BLACK;
+			if (c.parent().left() == c) {
+				this.rotateLeft(c.parent());
+			} else {
+				this.rotateRight(c.parent());
+			}
+		}
+		this.deleteCase3(c);
+	}
+
+	private void deleteCase3(BinaryTreeWithParent<RBNode<T>> c) {
+		BinaryTreeWithParent<RBNode<T>> s = this.sibiling(c);
+		if (c.parent().root().color.equals(Color.BLACK) && this.isSibilingTreeBlack(s)) {
+			s.root().color = Color.RED;
+			this.deleteCase1(c.parent());
+		} else {
+			this.deleteCase4(c);
+		}
+	}
+
+	private void deleteCase4(BinaryTreeWithParent<RBNode<T>> c) {
+		BinaryTreeWithParent<RBNode<T>> s = this.sibiling(c);
+		if (c.parent().root().color.equals(Color.RED) && this.isSibilingTreeBlack(s)) {
+			s.root().color = Color.RED;
+			c.parent().root().color = Color.BLACK;
+		} else {
+			this.deleteCase5(c);
+		}
+
+	}
+
+	private void deleteCase5(BinaryTreeWithParent<RBNode<T>> c) {
+		BinaryTreeWithParent<RBNode<T>> s = this.sibiling(c);
+
+		if (s.root().color.equals(Color.BLACK)) {
+			/*
+			 * this if statement is trivial, due to case 2 (even though case 2
+			 * changed the sibling to a sibling's child, the sibling's child
+			 * can't be red, since no red parent can have a red child). the
+			 * following statements just force the red to be on the left of the
+			 * left of the parent, or right of the right, so case six will
+			 * rotate correctly.
+			 */
+			if (c.parent().left() == c && (s.right().isNil() || s.right().root().color.equals(Color.BLACK))
+					&& (!s.left().isNil() && s.left().root().color.equals(Color.RED))) {
+				s.root().color = Color.RED;
+				s.left().root().color = Color.BLACK;
+				this.rotateRight(s);
+			} else if (c.parent().right() == c && (s.left().isNil() || s.left().root().color.equals(Color.BLACK))
+					&& (!s.right().isNil() && s.right().root().color.equals(Color.RED))) {
+				s.root().color = Color.RED;
+				s.right().root().color = Color.BLACK;
+				this.rotateLeft(s);
+			}
+		}
+		deleteCase6(c);
+	}
+
+	private void deleteCase6(BinaryTreeWithParent<RBNode<T>> c) {
+		BinaryTreeWithParent<RBNode<T>> s = this.sibiling(c);
+		s.root().color = c.parent().root().color;
+		c.parent().root().color = Color.BLACK;
+		if (c.parent().left() == c) {
+			s.right().root().color = Color.BLACK;
+			rotateLeft(c.parent());
+		} else {
+			s.left().root().color = Color.BLACK;
+			rotateRight(c.parent());
+		}
+	}
+
+	private boolean isSibilingTreeBlack(BinaryTreeWithParent<RBNode<T>> s) {
+		return s.root().color.equals(Color.BLACK) && (s.left().isNil() || s.left().root().color.equals(Color.BLACK))
+				&& (s.right().isNil() || s.right().root().color.equals(Color.BLACK));
+	}
+
+	private void replaceNode(BinaryTreeWithParent<RBNode<T>> m, BinaryTreeWithParent<RBNode<T>> c) {
+		if (m.parent() == null) {
+			this.tree = c;
+			this.tree.setParent(null);
+		} else {
+			if (m.parent().left() == m) {
+				m.parent().setLeft(c);
+			} else {
+				m.parent().setRight(c);
+			}
+		}
 	}
 
 	@Override
@@ -169,6 +289,7 @@ public class RedBlackTreeSearch<T extends Comparable<T>> implements Search<T> {
 		if (!base.isNil()) {
 			suc = min(base.right());
 			if (suc.isNil()) {
+				suc = base;
 				BinaryTreeWithParent<RBNode<T>> parent = suc.parent();
 				while (parent != null && parent.left() != suc) {
 					suc = parent;
@@ -190,6 +311,7 @@ public class RedBlackTreeSearch<T extends Comparable<T>> implements Search<T> {
 		if (!base.isNil()) {
 			pred = max(base.left());
 			if (pred.isNil()) {
+				pred = base;
 				BinaryTreeWithParent<RBNode<T>> parent = pred.parent();
 				while (parent != null && parent.right() != pred) {
 					pred = parent;
@@ -239,67 +361,80 @@ public class RedBlackTreeSearch<T extends Comparable<T>> implements Search<T> {
 		} else if (leaf.parent().root().color.equals(Color.RED)) {
 			BinaryTreeWithParent<RBNode<T>> u = this.uncle(leaf);
 			if (!u.isNil() && u.root().color.equals(Color.RED)) {
-				BinaryTreeWithParent<RBNode<T>> gp= this.grandParent(leaf);
-				u.root().color= Color.BLACK;
-				leaf.parent().root().color= Color.BLACK;
-				gp.root().color= Color.RED;
+				BinaryTreeWithParent<RBNode<T>> gp = this.grandParent(leaf);
+				u.root().color = Color.BLACK;
+				leaf.parent().root().color = Color.BLACK;
+				gp.root().color = Color.RED;
 				this.accomodate(gp);
 			} else {
-				BinaryTreeWithParent<RBNode<T>> parent= leaf.parent();
-				BinaryTreeWithParent<RBNode<T>> grandParent= this.grandParent(leaf);
-				if(grandParent.left().right() == leaf){
+				BinaryTreeWithParent<RBNode<T>> parent = leaf.parent();
+				BinaryTreeWithParent<RBNode<T>> grandParent = this.grandParent(leaf);
+				if (grandParent.left().right() == leaf) {
 					this.rotateLeft(parent);
-					leaf= leaf.left();
-				}else if(grandParent.right().left() == leaf){
+					leaf = leaf.left();
+				} else if (grandParent.right().left() == leaf) {
 					this.rotateRight(parent);
-					leaf= leaf.right();
+					leaf = leaf.right();
 				}
-				parent= leaf.parent();
-				grandParent= this.grandParent(leaf);
-				if(parent.left() == leaf){
-					leaf= this.rotateRight(grandParent);					
-				}else{
-					leaf=this.rotateLeft(grandParent);
-					
+				parent = leaf.parent();
+				grandParent = this.grandParent(leaf);
+				if (parent.left() == leaf) {
+					leaf = this.rotateRight(grandParent);
+				} else {
+					leaf = this.rotateLeft(grandParent);
+
 				}
-				parent.root().color= Color.BLACK;
-				grandParent.root().color= Color.RED;
-				while(leaf.parent()!=null){
-					leaf= leaf.parent();
+				parent.root().color = Color.BLACK;
+				grandParent.root().color = Color.RED;
+				while (leaf.parent() != null) {
+					leaf = leaf.parent();
 				}
-				this.tree= leaf;
+				this.tree = leaf;
 			}
 		}
 	}
-	private BinaryTreeWithParent<RBNode<T>> rotateLeft(BinaryTreeWithParent<RBNode<T>> t){
-		BinaryTreeWithParent<RBNode<T>> tmp= t.right();
-		BinaryTreeWithParent<RBNode<T>> p= t;
-		if(!tmp.isNil()){
-			BinaryTreeWithParent<RBNode<T>> parent= t.parent();
-			if(parent.left() == t){
-				parent.setLeft(tmp);
-			}else{
-				parent.setRight(tmp);
+
+	private BinaryTreeWithParent<RBNode<T>> rotateLeft(BinaryTreeWithParent<RBNode<T>> n) {
+		BinaryTreeWithParent<RBNode<T>> nnew = n.right();
+		BinaryTreeWithParent<RBNode<T>> p = n;
+		if (!nnew.isNil()) {
+			BinaryTreeWithParent<RBNode<T>> parent = n.parent();
+			n.setRight(nnew.left());
+			nnew.setLeft(n);
+			if (parent != null) {
+				if (parent.left() == n) {
+					parent.setLeft(nnew);
+				} else {
+					parent.setRight(nnew);
+				}
+			} else {
+				nnew.setParent(parent);
 			}
-			t.setRight(tmp.left());			
-			tmp.setLeft(t);			
-			p= tmp;
+			p = nnew;
 		}
 		return p;
 	}
-	private BinaryTreeWithParent<RBNode<T>> rotateRight(BinaryTreeWithParent<RBNode<T>> t){
-		BinaryTreeWithParent<RBNode<T>> tmp= t.left();
-		BinaryTreeWithParent<RBNode<T>> p= t;
-		if(!tmp.isNil()){
-			BinaryTreeWithParent<RBNode<T>> parent= t.parent();
-			if(parent.left() == t){
-				parent.setLeft(tmp);
-			}else{
-				parent.setRight(tmp);
+
+	private BinaryTreeWithParent<RBNode<T>> rotateRight(BinaryTreeWithParent<RBNode<T>> n) {
+		BinaryTreeWithParent<RBNode<T>> nnew = n.left();
+		BinaryTreeWithParent<RBNode<T>> p = n;
+		if (!nnew.isNil()) {
+			BinaryTreeWithParent<RBNode<T>> parent = n.parent();
+			if (parent != null) {
+
 			}
-			t.setLeft(tmp.right());			
-			tmp.setRight(t);			
-			p= tmp;
+			n.setLeft(nnew.right());
+			nnew.setRight(n);
+			if (parent != null) {
+				if (parent.left() == n) {
+					parent.setLeft(nnew);
+				} else {
+					parent.setRight(nnew);
+				}
+			} else {
+				nnew.setParent(parent);
+			}
+			p = nnew;
 		}
 		return p;
 	}
